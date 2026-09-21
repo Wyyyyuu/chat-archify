@@ -1,0 +1,7 @@
+interface:
+  display_name: "Chat Archify · 对话脉络图"
+  short_description: "梳理长对话或项目讨论的分支、决策与转向，生成带证据和资源链接的交互脉络图"
+  default_prompt: "使用 $chat-archify 梳理当前长对话或指定项目的讨论，生成保留分支、关键转折、来源证据和可选资源链接的交互脉络图。"
+
+policy:
+  allow_implicit_invocation: false

@@ -1,0 +1,159 @@
+{
+  "schema_version": 1,
+  "project": {
+    "title": "阅读计划讨论（虚构示例）",
+    "summary": "单个普通对话，无项目、仓库或附件。",
+    "updated_at": "",
+    "current_state": "已形成试行计划，尚无执行或复盘结果。"
+  },
+  "coverage": [
+    "仅覆盖所附4条虚构消息。"
+  ],
+  "sources": [
+    {
+      "id": "conversation",
+      "title": "阅读计划讨论（虚构）",
+      "kind": "conversation",
+      "coverage": "full",
+      "locator": "conversation.md 第1—4条消息",
+      "uri": "./conversation.md",
+      "note": "演示材料，不是真实对话。"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "goal",
+      "kind": "goal",
+      "title": "恢复阅读习惯",
+      "summary": "讨论适合自己的阅读频率。",
+      "reason": "根据指定消息记录，不推断后续结果。",
+      "branch": "主线",
+      "status": "proposed",
+      "date": "",
+      "evidence": [
+        {
+          "source": "conversation",
+          "locator": "conversation.md 第 1 条消息",
+          "note": "虚构示例"
+        }
+      ],
+      "artifacts": []
+    },
+    {
+      "id": "daily",
+      "kind": "experiment",
+      "title": "每天十分钟",
+      "summary": "助手提出每天少量阅读的候选方案，尚未执行。",
+      "reason": "根据指定消息记录，不推断后续结果。",
+      "branch": "每天阅读",
+      "status": "proposed",
+      "date": "",
+      "evidence": [
+        {
+          "source": "conversation",
+          "locator": "conversation.md 第 2 条消息",
+          "note": "虚构示例"
+        }
+      ],
+      "artifacts": []
+    },
+    {
+      "id": "weekend",
+      "kind": "experiment",
+      "title": "比较周末集中读",
+      "summary": "工作日不稳定，用户提出另一候选方案。",
+      "reason": "根据指定消息记录，不推断后续结果。",
+      "branch": "周末阅读",
+      "status": "proposed",
+      "date": "",
+      "evidence": [
+        {
+          "source": "conversation",
+          "locator": "conversation.md 第 3 条消息",
+          "note": "虚构示例"
+        }
+      ],
+      "artifacts": []
+    },
+    {
+      "id": "decision",
+      "kind": "decision",
+      "title": "先试每天十分钟",
+      "summary": "用户决定先试每天十分钟并允许漏读，一个月后再评估；尚无执行结果。",
+      "reason": "根据指定消息记录，不推断后续结果。",
+      "branch": "主线",
+      "status": "completed",
+      "date": "",
+      "evidence": [
+        {
+          "source": "conversation",
+          "locator": "conversation.md 第 4 条消息",
+          "note": "虚构示例"
+        }
+      ],
+      "artifacts": []
+    }
+  ],
+  "edges": [
+    {
+      "from": "goal",
+      "to": "daily",
+      "type": "branches",
+      "confidence": "explicit",
+      "reason": "针对阅读频率提出每天阅读方案。",
+      "evidence": [
+        {
+          "source": "conversation",
+          "locator": "conversation.md 第 2 条消息",
+          "note": "虚构示例"
+        }
+      ]
+    },
+    {
+      "from": "goal",
+      "to": "weekend",
+      "type": "branches",
+      "confidence": "explicit",
+      "reason": "另行比较周末方案。",
+      "evidence": [
+        {
+          "source": "conversation",
+          "locator": "conversation.md 第 3 条消息",
+          "note": "虚构示例"
+        }
+      ]
+    },
+    {
+      "from": "daily",
+      "to": "decision",
+      "type": "continues",
+      "confidence": "explicit",
+      "reason": "决定先试每天十分钟。",
+      "evidence": [
+        {
+          "source": "conversation",
+          "locator": "conversation.md 第 4 条消息",
+          "note": "虚构示例"
+        }
+      ]
+    },
+    {
+      "from": "weekend",
+      "to": "decision",
+      "type": "merges",
+      "confidence": "explicit",
+      "reason": "比较候选后形成决定，未声称已实际执行。",
+      "evidence": [
+        {
+          "source": "conversation",
+          "locator": "conversation.md 第 4 条消息",
+          "note": "虚构示例"
+        }
+      ]
+    }
+  ],
+  "open_questions": [
+    "一个月后的执行与调整情况未知。"
+  ],
+  "revisions": []
+}
