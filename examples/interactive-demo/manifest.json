@@ -1,0 +1,11 @@
+{
+  "title": "虚构阅读计划对话脉络",
+  "chapters": [
+    {
+      "id": "overview",
+      "label": "讨论总览",
+      "record": "evolution.json",
+      "viewer": "archify-overview.html"
+    }
+  ]
+}

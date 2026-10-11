@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+.venv/
+.env
+.env.*
+*.sqlite*
+*.db
+*.license.json
+data/
+releases/
+demo-output/
+plain-demo/
+paid-updates/data/
+paid-updates/releases/

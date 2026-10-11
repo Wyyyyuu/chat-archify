@@ -1,0 +1,34 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Fictional Reading Plan Discussion",
+    "locale": "zh-CN",
+    "quality_profile": "showcase"
+  },
+  "lanes": [
+    {"id": "reader", "label": "阅读者"},
+    {"id": "options", "label": "讨论中的方案"},
+    {"id": "weekend-option", "label": "周末候选"},
+    {"id": "follow-up", "label": "后续"}
+  ],
+  "mainPath": ["question", "daily-option", "combined-plan", "review-later"],
+  "nodes": [
+    {"id": "question", "lane": "reader", "col": 0, "type": "frontend", "label": "恢复稳定阅读", "sublabel": "提出目标"},
+    {"id": "daily-option", "lane": "options", "col": 1, "type": "backend", "label": "每日短读尝试", "sublabel": "每天十分钟"},
+    {"id": "weekend-option", "lane": "weekend-option", "col": 1, "type": "backend", "label": "周末集中尝试", "sublabel": "保留候选"},
+    {"id": "combined-plan", "lane": "options", "col": 3, "type": "security", "label": "合并为弹性阅读计划", "sublabel": "默认短读 · 忙时补读", "tag": "已讨论", "width": 160},
+    {"id": "review-later", "lane": "options", "col": 4, "type": "external", "label": "一个月后再复盘", "sublabel": "结果未知"}
+  ],
+  "edges": [
+    {"from": "question", "to": "daily-option", "label": "候选 A", "role": "branch"},
+    {"from": "question", "to": "weekend-option", "label": "候选 B", "role": "branch"},
+    {"from": "daily-option", "to": "combined-plan", "label": "默认安排"},
+    {"from": "weekend-option", "to": "combined-plan", "label": "忙时补读", "fromSide": "right", "toSide": "bottom"},
+    {"from": "combined-plan", "to": "review-later", "label": "后续检查"}
+  ],
+  "cards": [
+    {"dot": "emerald", "title": "讨论结果", "items": ["每日短读是默认计划", "工作日忙碌时可周末补读", "这仍是计划，不是执行记录"]},
+    {"dot": "cyan", "title": "证据范围", "items": ["全部对话为虚构演示消息", "一月后的实际结果未知"]}
+  ]
+}

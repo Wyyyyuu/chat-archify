@@ -1,0 +1,12 @@
+{
+  "sku": "chat-archify-pro",
+  "name": "Chat Archify Pro",
+  "version": "0.4.0",
+  "release_channel": "local-preview",
+  "visibility": "private",
+  "purchase_model": "one_time",
+  "checkout_status": "not_connected",
+  "repository": "https://github.com/Wyyyyuu/chat-archify-pro",
+  "release": "https://github.com/Wyyyyuu/chat-archify-pro/releases/tag/v0.4.0",
+  "update_entitlement": "configurable; commercial duration not fixed"
+}

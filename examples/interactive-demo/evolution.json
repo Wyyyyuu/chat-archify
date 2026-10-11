@@ -1,0 +1,219 @@
+{
+  "schema_version": 1,
+  "project": {
+    "title": "虚构阅读计划讨论",
+    "summary": "六条虚构消息如何从两个阅读时段候选汇合为一个试行计划。",
+    "updated_at": "",
+    "current_state": "形成了一个待执行的弹性计划；尚无实际阅读结果。"
+  },
+  "coverage": [
+    "仅覆盖 conversation.md 中六条明确标为虚构的消息。没有推断真实任务、执行记录或历史附件。"
+  ],
+  "sources": [
+    {
+      "id": "fictional-chat",
+      "title": "虚构阅读计划讨论",
+      "kind": "conversation",
+      "coverage": "full",
+      "locator": "11111111-1111-4111-8111-111111111111；conversation.md 中全部六条演示消息",
+      "uri": "conversation.md",
+      "note": "纯虚构演示材料。没有提供原任务 URL，因此只展示人工定位信息。"
+    },
+    {
+      "id": "source-brief",
+      "title": "补充阅读资料",
+      "kind": "document",
+      "coverage": "full",
+      "locator": "resources/source-brief.md",
+      "uri": "resources/source-brief.md",
+      "note": "同一文件也作为阶段产物列出，用于验证来源字段不会绕过 Lite 文件额度。"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "question",
+      "kind": "goal",
+      "title": "恢复稳定阅读",
+      "summary": "讨论如何在时间不稳定时恢复阅读习惯。",
+      "reason": "消息提出了目标，但没有提供后续执行证据。",
+      "branch": "阅读计划",
+      "status": "proposed",
+      "date": "",
+      "evidence": [
+        {
+          "source": "fictional-chat",
+          "locator": "轮次 ID：aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1；conversation.md L5–10",
+          "note": "虚构用户提出阅读习惯目标。"
+        }
+      ],
+      "artifacts": []
+    },
+    {
+      "id": "daily-option",
+      "kind": "experiment",
+      "title": "每日短读尝试",
+      "summary": "助手提出每天读十分钟，降低开始门槛。",
+      "reason": "连续的小目标可能更容易安排；这只是候选建议。",
+      "branch": "每日短读",
+      "status": "proposed",
+      "date": "",
+      "evidence": [
+        {
+          "source": "fictional-chat",
+          "locator": "轮次 ID：bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb2；conversation.md L12–17",
+          "note": "虚构助手提出每日十分钟。"
+        }
+      ],
+      "artifacts": [
+        {
+          "label": "阅读计划 Markdown",
+          "uri": "resources/reading-plan.md",
+          "role": "produced",
+          "verification": "exists",
+          "version": "fictional-demo-1",
+          "note": "展示两份可在页面内相互打开的 Markdown 快照；不是实际执行记录。"
+        },
+        {
+          "label": "每日短读指南",
+          "uri": "resources/daily-guide.md",
+          "role": "produced",
+          "verification": "exists",
+          "version": "fictional-demo-1",
+          "note": "第三份虚构 Markdown 附件。"
+        }
+      ]
+    },
+    {
+      "id": "weekend-option",
+      "kind": "experiment",
+      "title": "周末集中尝试",
+      "summary": "用户提出另一种候选：将阅读集中到周末。",
+      "reason": "工作日时间不稳定，因此保留平行选择。",
+      "branch": "周末集中",
+      "status": "proposed",
+      "date": "",
+      "evidence": [
+        {
+          "source": "fictional-chat",
+          "locator": "轮次 ID：cccccccc-cccc-4ccc-8ccc-ccccccccccc3；conversation.md L19–24",
+          "note": "虚构用户提出周末方案。"
+        }
+      ],
+      "artifacts": []
+    },
+    {
+      "id": "combined-plan",
+      "kind": "decision",
+      "title": "合并为弹性阅读计划",
+      "summary": "讨论后选择每日十分钟作为默认安排，并在工作日繁忙时保留周末补读选项。",
+      "reason": "回应了希望保持连续性与工作日时间不稳定这两项约束。",
+      "branch": "阅读计划",
+      "status": "completed",
+      "date": "",
+      "evidence": [
+        {
+          "source": "fictional-chat",
+          "locator": "轮次 ID：dddddddd-dddd-4ddd-8ddd-ddddddddddd4；conversation.md L26–31",
+          "note": "虚构助手提出每日短读为默认安排，并保留周末补读选项。"
+        },
+        {
+          "source": "fictional-chat",
+          "locator": "消息 ID：fiction-msg-05；conversation.md L33–38",
+          "note": "虚构用户接受计划，并说明尚无执行结果。"
+        },
+        {
+          "source": "fictional-chat",
+          "locator": "消息 ID：fiction-msg-06；conversation.md L40–45",
+          "note": "虚构助手附上阅读计划和一月复盘清单。"
+        },
+        {
+          "source": "source-brief",
+          "locator": "resources/source-brief.md",
+          "note": "补充资料作为该阶段引用的文档证据。"
+        }
+      ],
+      "artifacts": [
+        {
+          "label": "一月复盘清单",
+          "uri": "resources/review-checklist.md",
+          "role": "produced",
+          "verification": "exists",
+          "version": "fictional-demo-1",
+          "note": "复盘模板不是已完成的复盘结果。"
+        },
+        {
+          "label": "补充阅读资料",
+          "uri": "resources/source-brief.md",
+          "role": "referenced",
+          "verification": "exists",
+          "version": "fictional-demo-1",
+          "note": "同一 Markdown 文件也登记为 document source。"
+        }
+      ]
+    },
+    {
+      "id": "review-later",
+      "kind": "milestone",
+      "title": "一个月后再复盘",
+      "summary": "后续应检查计划是否可执行，再决定保持或调整。",
+      "reason": "对话没有提供未来的阅读表现；结果仍未知。",
+      "branch": "后续检查",
+      "status": "proposed",
+      "date": "",
+      "evidence": [
+        {
+          "source": "fictional-chat",
+          "locator": "消息 ID：fiction-msg-05；conversation.md L33–38",
+          "note": "虚构用户提出一个月后再看计划是否适合。"
+        }
+      ],
+      "artifacts": []
+    }
+  ],
+  "edges": [
+    {
+      "from": "question",
+      "to": "daily-option",
+      "type": "branches",
+      "confidence": "explicit",
+      "reason": "从阅读目标提出每日短读候选。",
+      "evidence": [{"source": "fictional-chat", "locator": "轮次 ID：bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb2", "note": "虚构助手提出此候选。"}]
+    },
+    {
+      "from": "question",
+      "to": "weekend-option",
+      "type": "branches",
+      "confidence": "explicit",
+      "reason": "从同一阅读目标提出周末集中候选。",
+      "evidence": [{"source": "fictional-chat", "locator": "轮次 ID：cccccccc-cccc-4ccc-8ccc-ccccccccccc3", "note": "虚构用户提出此候选。"}]
+    },
+    {
+      "from": "daily-option",
+      "to": "combined-plan",
+      "type": "merges",
+      "confidence": "explicit",
+      "reason": "每日短读被选为弹性计划的默认安排。",
+      "evidence": [{"source": "fictional-chat", "locator": "消息 ID：fiction-msg-05；conversation.md L33–38", "note": "虚构用户接受每日短读作为默认计划。"}]
+    },
+    {
+      "from": "weekend-option",
+      "to": "combined-plan",
+      "type": "merges",
+      "confidence": "explicit",
+      "reason": "周末方案作为忙碌时的补读选项纳入计划。",
+      "evidence": [{"source": "fictional-chat", "locator": "消息 ID：fiction-msg-05；conversation.md L33–38", "note": "虚构用户接受周末作为忙碌时的补读选项。"}]
+    },
+    {
+      "from": "combined-plan",
+      "to": "review-later",
+      "type": "continues",
+      "confidence": "explicit",
+      "reason": "讨论提出一个月后复盘，但尚无执行结果。",
+      "evidence": [{"source": "fictional-chat", "locator": "消息 ID：fiction-msg-06；conversation.md L40–45", "note": "虚构助手记录一月后的后续复盘。"}]
+    }
+  ],
+  "open_questions": [
+    "这份演示计划是否被采用、实际阅读频率如何，均无对话之外的证据。"
+  ],
+  "revisions": []
+}

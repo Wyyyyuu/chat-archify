@@ -1,0 +1,12 @@
+{
+  "title": "阅读计划讨论（虚构示例）",
+  "project_id": "fictional-reading-plan-plain",
+  "chapters": [
+    {
+      "id": "overview",
+      "label": "阅读计划讨论",
+      "record": "evolution.json",
+      "viewer": "archify-overview.html"
+    }
+  ]
+}

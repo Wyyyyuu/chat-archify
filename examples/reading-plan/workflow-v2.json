@@ -1,0 +1,107 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "普通阅读计划对话（虚构）",
+    "locale": "zh-CN",
+    "quality_profile": "showcase"
+  },
+  "lanes": [
+    {
+      "id": "reader",
+      "label": "阅读者"
+    },
+    {
+      "id": "options",
+      "label": "讨论中的方案"
+    },
+    {
+      "id": "weekend-option",
+      "label": "周末候选"
+    }
+  ],
+  "mainPath": [
+    "goal",
+    "daily",
+    "decision"
+  ],
+  "nodes": [
+    {
+      "id": "goal",
+      "lane": "reader",
+      "col": 0,
+      "type": "frontend",
+      "label": "恢复阅读习惯",
+      "sublabel": "提出目标"
+    },
+    {
+      "id": "daily",
+      "lane": "options",
+      "col": 1,
+      "type": "backend",
+      "label": "每天十分钟",
+      "sublabel": "每天十分钟"
+    },
+    {
+      "id": "weekend",
+      "lane": "weekend-option",
+      "col": 1,
+      "type": "backend",
+      "label": "比较周末集中读",
+      "sublabel": "保留候选"
+    },
+    {
+      "id": "decision",
+      "lane": "options",
+      "col": 3,
+      "type": "security",
+      "label": "先试每天十分钟",
+      "sublabel": "已形成计划 · 尚未执行",
+      "tag": "已讨论",
+      "width": 180
+    }
+  ],
+  "edges": [
+    {
+      "from": "goal",
+      "to": "daily",
+      "label": "候选 A",
+      "role": "branch"
+    },
+    {
+      "from": "goal",
+      "to": "weekend",
+      "label": "候选 B",
+      "role": "branch"
+    },
+    {
+      "from": "daily",
+      "to": "decision",
+      "label": "默认安排"
+    },
+    {
+      "from": "weekend",
+      "to": "decision",
+      "label": "比较后选择"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "讨论结果",
+      "items": [
+        "先试每晚十分钟",
+        "允许漏读，一个月后再评估",
+        "只完成选择，尚无执行结果"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "证据范围",
+      "items": [
+        "4条虚构消息，无原应用ID",
+        "缺少的回答不补写"
+      ]
+    }
+  ]
+}
