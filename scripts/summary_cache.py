@@ -11,6 +11,7 @@ import re
 import tempfile
 from pathlib import Path
 from credential_guard import content_credential_reason
+import reading_transport as transport
 
 POLICY = 'public-exact-duplicates-only-v2'
 PROMPT_VERSION = 'summary-v2'
@@ -193,6 +194,11 @@ def validate_summary(value, unit):
         if (not isinstance(point, dict) or not isinstance(point.get('text'), str) or not point['text'].strip()
                 or not isinstance(point.get('refs'), list) or not point['refs'] or any(r not in known for r in point['refs'])):
             raise ValueError('Summary point has missing text or unknown source references')
+        if 'superseded' in point:
+            change = point['superseded']
+            if (not isinstance(change,dict) or not isinstance(change.get('reason'),str) or not change['reason'].strip()
+                    or not isinstance(change.get('refs'),list) or not change['refs'] or any(r not in known for r in change['refs'])):
+                raise ValueError('Invalid superseded-point evidence')
     # Absence of a review is explicit. This is a record of a host judgement,
     # not a machine claim that the meaning is correct.
     reviewed = value.get('reviewed_omitted_refs', [])
@@ -203,6 +209,73 @@ def validate_summary(value, unit):
 
 def render_messages(messages):
     return '\n\n'.join(f"[{m['ref']} {m['role']}]\n{m['text']}" for m in messages)
+
+
+def delta_base(cache, head, unit, key):
+    if not key or key == unit['key']:
+        return None
+    base_head = {**head, 'units': {unit['id']: key}}
+    old = get_unit({'head': base_head}, cache, unit['id'])
+    n = len(old['messages'])
+    if not n or n >= len(unit['messages']) or old['messages'] != unit['messages'][:n]:
+        return None
+    summary = load_summary(cache, old)
+    if not summary:
+        return None
+    return {'base_key': key, 'base_count': n, 'summary_sha256': sha(canonical(summary)),
+            'points': summary['points']}
+
+
+def render_reading(plan, originals, units):
+    pending = set(plan['pending'])
+    aliases = {u['id']: 'U' + str(i + 1) for i,u in enumerate(units)}
+    entries, headings = [], []
+    for original in originals:
+        tid = original['thread_id']
+        if not any(u['thread_id'] == tid and u['id'] in pending for u in units):
+            continue
+        headings.append((len(entries), '# 对话：' + (original['title'] or tid)))
+        for context in plan['context']:
+            if context['thread_id'] != tid:
+                continue
+            for i,point in enumerate(context['points']):
+                label = f"{aliases[context['unit_id']]}/旧{i + 1} [{','.join(point['refs'])}]"
+                if point.get('superseded'):
+                    label += '（历史决定，已替代：' + point['superseded']['reason'] + '）'
+                entries.append({'unit_id':context['unit_id'], 'kind':'summary', 'ref':str(i+1),
+                                'label':label, 'text':point['text']})
+        for unit in units:
+            if unit['id'] not in pending or unit['thread_id'] != tid:
+                continue
+            delta = plan['deltas'].get(unit['id'])
+            headings.append((len(entries), '## ' + aliases[unit['id']] + (' 续写' if delta else '')))
+            if delta:
+                for i,point in enumerate(delta['points']):
+                    label=f"旧{i + 1} [{','.join(point['refs'])}]"
+                    if point.get('superseded'):
+                        label += '（历史决定，已替代：' + point['superseded']['reason'] + '）'
+                    entries.append({'unit_id':unit['id'],'kind':'base_summary','ref':str(i+1),
+                                    'label':label,'text':point['text']})
+            for message in unit['messages'][delta['base_count'] if delta else 0:]:
+                role = ('问' if message['role']=='user' else '答' if message['phase'] in {'final','final_answer'}
+                        else '记' if message['phase']=='commentary' else '助')
+                if message['partial']:
+                    role += '（原文不完整）'
+                entries.append({'unit_id':unit['id'],'kind':'message','ref':message['ref'],
+                                'role':message['role'],'phase':message['phase'],
+                                'label':f"{message['ref']} {role}", 'text':message['text']})
+    packed = transport.encode(entries)
+    packed['aliases'] = aliases
+    packed['head_sha256'] = plan['head_sha256']
+    blocks = {}
+    for position,title in headings: blocks.setdefault(position,[]).append(title)
+    lines=[PROMPT, '计划：'+plan['head_sha256'], '收录范围：'+str(plan['head']['coverage'].get('status','unknown')),
+           'U=轮次，m=消息（映射见 reading-map.json）；问=用户，答=最终回答，记=助手过程，助=阶段未标明。',
+           '〔同文 Bn〕引用本包前文；保留每次出现及立场。旧摘要须核对新证据，失败和待办不能自动删除。']
+    for i,(entry,body) in enumerate(zip(packed['entries'],transport.render(packed))):
+        lines.extend(blocks.get(i,[]))
+        lines.append(entry['label']+'\n'+body)
+    return ('\n\n'.join(lines)+'\n' if pending else ''), packed
 
 
 def prepare(collection, sources, cache, out, pins=None, profile='host-default'):
@@ -243,39 +316,34 @@ def prepare(collection, sources, cache, out, pins=None, profile='host-default'):
                for u in units if u['id'] in summaries and u['thread_id'] in changed_threads]
     head = {'scope': scope, 'units': current, 'policy': policy_id(), 'prompt_version': prompt_id(),
             'profile': profile, 'originals': originals, 'coverage': coverage}
+    head['aliases'] = {u['id']:'U'+str(i+1) for i,u in enumerate(units)}
+    deltas = {}
+    if all(prior.get(k) == head[k] for k in ('scope','policy','prompt_version','profile')):
+        for unit in units:
+            if unit['id'] not in pending:
+                continue
+            # A second prepare before accept must retain the same eligible base.
+            candidates = [prior.get('units',{}).get(unit['id']), prior.get('summary_bases',{}).get(unit['id'])]
+            for key in candidates:
+                value = delta_base(cache, head, unit, key)
+                if value:
+                    deltas[unit['id']] = value
+                    break
+    head['summary_bases'] = {uid:value['base_key'] for uid,value in deltas.items()}
     head_hash = sha(canonical(head))
     plan = {'schema_version': 1, 'head_sha256': head_hash, 'cache': str(cache), 'head': head,
-            'pending': pending, 'reused': reused, 'removed': removed, 'context': context,
+            'pending': pending, 'reused': reused, 'removed': removed, 'context': context, 'deltas': deltas,
             'counts': {'turns': len(units), 'messages': sum(len(u['messages']) for u in units),
                        'selected_messages': sum(len(u['selected']) for u in units),
                        'omitted_messages': sum(len(u['omitted']) for u in units)},
             'assurance': 'Source identity and cache consistency only; semantic review is separate'}
-    lines = [PROMPT, '\n收录范围：' + str(coverage.get('status', 'unknown')),
-             '默认保留全部正文；仅同轮完全重复的过程正文改为引用，消息顺序与原文均保留。']
-    # Keep long provenance IDs in the machine plan, not repeated in every
-    # model-facing heading or cached point. Short IDs still resolve to originals.
-    for original in originals:
-        tid = original['thread_id']
-        if tid not in changed_threads:
-            continue
-        lines.append('\n# 对话：' + (original['title'] or tid))
-        prior_points = [c for c in context if c['thread_id'] == tid]
-        if prior_points:
-            lines.append('已有结论（新证据可能推翻）：')
-            for c in prior_points:
-                lines.append(c['unit_id'] + '\n' + '\n'.join(
-                    '- ' + p['text'] + ' [' + ','.join(p['refs']) + ']' for p in c['points']))
-        for u in units:
-            if u['id'] not in pending or u['thread_id'] != tid:
-                continue
-            lines.extend([f"\n## {u['id']}", render_selection(u)])
-    # No-op runs need no model request; do not emit a misleading empty prompt.
-    reading = '\n\n'.join(lines) + '\n' if pending else ''
+    reading, packed = render_reading(plan, originals, units)
     if removed:
         plan['reconciliation_required'] = 'Source units removed; review dependent graph nodes. No cached originals were deleted.'
     atomic(cache / 'head.json', canonical(head))
     atomic(out / 'plan.json', canonical(plan))
     atomic(out / 'reading-pack.md', reading.encode())
+    atomic(out / 'reading-map.json', canonical(packed))
     atomic(out / 'cached-summaries.json', canonical(summaries))
     return plan
 
@@ -309,18 +377,41 @@ def get_unit(plan, cache, uid):
     return unit
 
 
+def resolve_unit(plan, identifier):
+    if identifier in plan['head']['units']:
+        return identifier
+    matches = [uid for uid,alias in plan['head'].get('aliases',{}).items() if alias == identifier]
+    if len(matches) != 1:
+        raise ValueError('Unknown unit or reading-pack alias')
+    return matches[0]
+
+
 def accept(plan_path, summaries_path):
     plan, cache = checked_plan(plan_path)
     values = json.loads(Path(summaries_path).read_bytes())
+    bound = isinstance(values,dict) and values.get('plan') == plan['head_sha256']
+    if isinstance(values,dict):
+        if not bound:
+            raise ValueError('Summary batch belongs to a stale or different plan')
+        values = values.get('summaries')
     if not isinstance(values, list) or not values:
         raise ValueError('Expected a nonempty list of summaries')
     seen, validated = set(), []
     for value in values:
-        uid = value.get('unit_id')
+        if (value.get('unit_id') not in plan['head']['units'] or 'key' not in value) and not bound:
+            raise ValueError('Short aliases or omitted keys require a plan-bound summary batch')
+        uid = resolve_unit(plan, value.get('unit_id'))
+        value = {**value, 'unit_id':uid, 'key':value.get('key',plan['head']['units'][uid])}
         if uid in seen or uid not in plan['pending']:
             raise ValueError('Duplicate or non-pending summary')
         seen.add(uid)
         unit = get_unit(plan, cache, uid)
+        if uid in plan.get('deltas', {}):
+            expected = delta_base(cache, plan['head'], unit, plan['head'].get('summary_bases',{}).get(uid))
+            if expected != plan['deltas'][uid]:
+                raise ValueError('Delta base changed or no longer matches the current source')
+            value.setdefault('base_key', expected['base_key'])
+            value = merge_delta(value, unit, expected)
         validate_summary(value, unit)
         validated.append((unit, value))
     # Validate the complete submission before saving any summary.
@@ -328,6 +419,33 @@ def accept(plan_path, summaries_path):
         immutable(cache / 'summaries' / (unit['key'] + '.json'), canonical({
             'key': unit['key'], 'summary': value, 'sha256': sha(canonical(value))}))
     return {'accepted': len(validated), 'semantic_correctness': 'not machine-verified'}
+
+
+def merge_delta(value, unit, base):
+    if value.get('kind') != 'model_summary_delta' or value.get('base_key') != base['base_key']:
+        raise ValueError('Append update requires model_summary_delta and its exact base_key')
+    candidate = {**value, 'kind':'model_summary'}
+    validate_summary(candidate, unit)
+    added = {m['ref'] for m in unit['messages'][base['base_count']:]}
+    if any(not added.intersection(p['refs']) for p in value['points']):
+        raise ValueError('Each delta point must cite new evidence')
+    old = json.loads(json.dumps(base['points']))
+    seen = set()
+    changes = value.get('supersedes', [])
+    if not isinstance(changes,list) or any(not isinstance(c,dict) for c in changes):
+        raise ValueError('Invalid supersession list')
+    for change in changes:
+        index = change.get('point')
+        if (not isinstance(index,int) or isinstance(index,bool) or index < 1 or index > len(old) or index in seen
+                or not isinstance(change.get('reason'),str) or not change['reason'].strip()
+                or not isinstance(change.get('refs'),list) or not change['refs'] or not set(change['refs']) <= added):
+            raise ValueError('Supersession requires a real prior point and new source evidence')
+        seen.add(index)
+        old[index-1]['superseded'] = {'reason':change['reason'],'refs':change['refs']}
+    # Historical decisions and unresolved work are never silently discarded.
+    return {'unit_id':unit['id'],'key':unit['key'],'kind':'model_summary',
+            'points':old+value['points'], 'reviewed_omitted_refs':value.get('reviewed_omitted_refs',[]),
+            'delta_base_key':base['base_key']}
 
 
 def main():
@@ -356,7 +474,7 @@ def main():
             print(json.dumps(accept(args.plan, args.summaries)))
         else:
             plan, cache = checked_plan(args.plan)
-            unit = get_unit(plan, cache, args.unit)
+            unit = get_unit(plan, cache, resolve_unit(plan, args.unit))
             messages = [m for m in unit['messages'] if not args.ref or m['ref'] == args.ref]
             if not messages:
                 raise ValueError('Unknown message reference')

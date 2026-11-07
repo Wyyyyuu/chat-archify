@@ -1,98 +1,127 @@
-# Chat Archify Pro
+<div align="center">
 
-**English** | [简体中文](README.zh-CN.md)
+# Chat Archify
 
-Turn long conversations into an interactive map of branches, decisions and changes. Start with the overview on the left and guidance in the center and right panels. Click a stage to open its subflow, then a node to read its summary and linked files. Drag either divider to adjust the three panel widths. Click an event or node to follow the project and read formatted Markdown. No repository is required. **Runs only when explicitly requested.**
+### Long AI chats. A clear path forward.
 
-## Release status and comparison
+Turn scattered conversations into a clickable map of **what changed, why it changed, and where the work lives.**
 
-Current release: **0.6.1 · prerelease (2026-11-07)**. Program-level checks pass; real-browser visual, focus, touch, download and storage acceptance remains pending.
+**English** · [简体中文](README.zh-CN.md)
 
-Download `chat-archify-pro.zip` from [GitHub Releases](https://github.com/Wyyyyuu/chat-archify-pro/releases/tag/v0.6.1). Lite is public; Pro requires authorized GitHub access. One-time purchase checkout is not connected, and the commercial update-entitlement duration is not fixed.
+[Download the skill](https://github.com/Wyyyyuu/chat-archify-pro/releases/tag/v0.7.0) · [Try the HTML demo](https://github.com/Wyyyyuu/chat-archify-pro/releases/download/v0.7.0/chat-archify-demo.html) · [How it works](#from-conversation-to-context)
 
-| Capability | Lite (free) | Pro |
-| --- | --- | --- |
-| Scope | One conversation, one overview | Related conversations and multiple chapters |
-| Diagram and evidence | Complete nodes, branches and evidence | Complete nodes, branches and evidence |
-| Embedded attachments | Up to 3 distinct eligible files; other references remain visible | All eligible files, subject to per-file limits |
-| Search | Node titles | Nodes, file contents and saved excerpts |
-| Reading workspace | Diagram and node/file reading | Adjustable three-panel workspace and in-page conversation reader |
-| Conversation/module links | Source evidence on nodes | Bidirectional manual links, export/import and stale-link recovery |
-| Continuing in another AI | No dedicated handoff export | Project/chapter/node continuation packs |
-| Updating an existing map | Regenerate | Stable identities, snapshot reuse, review and approved application |
-| Skill update access | Public repository and release downloads | Manually issued authorization and verified ZIP download; checkout is not connected |
+**One full version · Offline HTML · Use only when you ask**
 
-Both editions run only when explicitly requested and retain rendered/raw Markdown, eligible attachment downloads, offline HTML and structured JSON. Lite limits scope and embedded files, not the number of graph nodes. Each embedded file has a 25 MiB limit and remains subject to credential exclusions.
+</div>
 
-## Edition capabilities
+![Overview, a branching reading plan, and linked resources in one workspace](assets/showcase/workspace-en.png)
 
-Multiple related conversations and chapters; all eligible file snapshots; full-text search across nodes, files and saved excerpts; incremental record updates and `--snapshot-from` snapshot reuse.
+*Interface illustration using the included fictional reading-plan example, not a browser screenshot. Download the HTML above and open it locally to explore the actual interactive version.*
 
-Both editions retain complete nodes and relationships, crossing checks, node evidence, formatted/raw Markdown, downloads, offline HTML and structured JSON. The free quota does not truncate the conversation map.
+## Keep the context. Keep building.
 
-Pro retains adjustable panel widths with keyboard support and local preferences, a guided three-panel start with the overview flowchart centered in its panel, and concise details. The first three linked resources stay visible; expand the rest when needed. Metadata and source records share one closed disclosure. Returning from a file restores disclosure states and scroll position. Clear type hierarchy and colored, text-labeled status badges improve scanning. Compact checked flowcharts and functional groups for code files remain available. AI edits the evidence-backed record; the packager reuses archived file bytes. Use **Continuation pack** to hand off concise progress, decisions, open questions and file purposes to another AI. **Review update** compares an old page with the candidate before you approve or reject it; application checks the exact reviewed input hashes.
+You built something with AI. Then the chat grew, files multiplied, and the plan changed. A week later: which version worked? Why was that approach dropped? Which file matters now?
 
-Version 0.4.1 refreshes the workspace with a quiet dotted canvas, consistent line icons, clearer file cards and a directly accessible conversation button. Selection highlights only recorded upstream paths. Simple verified forks and joins use two lanes; complex graphs keep their checked compact layout. Every original event, relationship and archived file is preserved. Extra tools remain available in **More tools**.
+Chat Archify is a skill for answering those questions. It turns the available conversation history into a navigable project record, with evidence and outputs attached to the steps that produced them. Built for people learning to build with AI; useful for any long-running discussion.
 
-The interface is a fixed template customized through project data, not a new UI generated per project. Small screens use explicit overview/flow/detail views. See the [workbench contract](references/workbench.md).
+| When you need to… | Chat Archify helps you… |
+| --- | --- |
+| Understand an unfamiliar project | Follow a compact overview, then open one stage at a time. |
+| Find the reason behind a change | Trace decisions, alternatives, failed attempts, and unfinished work back to the saved conversation. |
+| Find the right file | See a short purpose label, read rendered Markdown, or download an eligible embedded file. |
+| Switch to another AI | Export a continuation pack with the current state, constraints, key files, and next goal. |
+| Update the record | Reuse valid summaries and review additions, changes, and removals before applying a candidate. |
 
-Version 0.6.1 retains every eligible message by default, replacing only exact repeated commentary within a turn with an ordered reference. It removes keyword-based omissions that could hide decisions, setbacks or unfinished work. Incremental summary caching, full original archives, targeted rereads and pinned evidence remain available; older selection-policy summaries are invalidated. Natural-language device/login codes are also excluded. The short Skill entrypoint loads detailed instructions on demand. Savings come primarily from reuse, not first-pass truncation; semantic correctness still requires source review. See [Incremental summaries](references/incremental-summaries.md).
+## From conversation to context
 
-Version 0.5.0 adds an automated Codex host-tool collector with active/archive pagination, resumable checkpoints, bounded retries, public-message-only exports and credential filtering. Machine checks reconcile page chains, saved messages, export hashes and packaged sources. Pending pages or inconsistent data block packaging; actual provider gaps require an explicit partial-coverage mode and remain visible in the index. This checks the tool-visible scope and local consistency, not inaccessible or deleted history. See [Automatic collection](references/automatic-collection.md).
+**1. Start with the map.** See the overall path without reading the entire transcript. Open a stage to explore its flow; resize the three panels to suit the task.
 
-Version 0.4.3 introduced the source-coverage workflow: enumerate relevant chats, exhaust both discovery and message pagination, record exclusions and unread ranges, and reconcile sources with modules. Version 0.5.0 automates those collection and consistency checks. Checked coverage and displayed excerpts remain distinct; deleted or inaccessible history remains a stated gap.
+**2. Open the evidence.** Select a node for a short explanation and relevant resources. Read saved questions and answers in an in-page conversation reader. Return from a file without losing the expanded record and reading position.
 
-Version 0.4.2 fixes module-scoped conversation indexes: confirmed links are the default, same-source candidates require an explicit action, matching messages within long turns are highlighted, and picker filters and breadcrumb return state are corrected. Targeted conversation recovery can refresh named chat exports while keeping all other archived file bytes.
+**3. Continue with context.** Export a handoff for another AI, or update the existing map after more work. Stable identities keep records connected; unchanged summaries do not need to be generated again.
 
-Conversation cards use the current turn’s user question as their title. Click a card to open a large reading dialog within the same page, with separate user, assistant and saved-summary messages. Close or press Escape to return to the original index or context with filters and position preserved. Local extraction requires no model calls; saved summaries remain labeled, and stages with no linked excerpts show an explicit empty state.
+![Actual basic-renderer SVG export of the fictional reading-plan record](assets/showcase/example-flow.png)
 
-Saved turns can link to one or more modules in both directions. In a module’s detailed record, choose **Link existing conversation** (关联已有对话), select a saved turn, then link it. The conversation reader also offers a module selector and direct module navigation. Original associations and manual links have separate labels; source-only candidates remain collapsed and do not count as confirmed links.
+*Actual basic-renderer export: one goal, two candidate approaches, a combined plan, and a future review. The full HTML adds the workspace, file reader, conversation index, and handoff tools. “Proposed” is deliberately not presented as “verified.”*
 
-Manual links save in the browser when storage is available, with an explicit session-only notice otherwise. **Export links / Import links** (导出关联 / 导入关联) transfer association metadata between browsers or HTML versions. The JSON contains no messages or file contents and cannot restore missing conversations. Retain `project_id`, module IDs and optional source `conversation_id` when updating. Normal source refresh supports `--identity-from old.html`; UI-only refresh uses `--snapshot-from old.html`. Unresolved links remain visible and exportable for recovery alongside valid links. Local bindings do not rewrite the HTML or evidence record; share the association JSON alongside the page when needed.
+### More than a diagram
 
-## Ordinary conversations and version changes
+- **Files with meaning:** short descriptions and purpose-based groups; no wall of per-file code diffs by default.
+- **Traceable conversations:** question-based index titles, in-page question/answer reading, search, and manual links between a conversation and a module.
+- **Collection receipts:** where supported, collect readable active and archived Codex chats with pagination, checkpoints, and explicit gaps. Other hosts can use user-provided exports.
+- **Incremental summaries:** content-bound reuse, append-only updates, and reversible references for exactly repeated text. Eligible original text stays available; important events are not removed by keyword filtering.
+- **Reviewable changes:** compare a previous map with a candidate. Approval is bound to those exact inputs; changes are not silently applied.
+- **Portable output:** one self-contained HTML for browsing, plus structured records for editing. No account or hosted viewer is required to open it.
 
-Role-labeled text and common `messages` JSON can be read as question/answer turns without original application UUIDs. Generated local segment identifiers stay distinct from original IDs; explicit line ranges or message positions can link real segments to nodes. Ambiguous roles and missing answers are not invented.
+## Try it in two minutes
 
-See [Continuation and updates](references/continuation-and-updates.md) for handoff packs, offline review pages and approved application. The one-time-purchase update service is maintained separately from this Skill; license material is not embedded in project pages.
+1. [Download the fictional demo](https://github.com/Wyyyyuu/chat-archify-pro/releases/download/v0.7.0/chat-archify-demo.html) and open it in a modern desktop browser. GitHub provides a file download, not a running HTML app.
+2. Click a stage, then **合并为弹性阅读计划**. Explore its explanation and linked files.
+3. Open **打开对话索引** to read the saved messages. Try **续聊包** to prepare a handoff.
 
-## Install and invoke
+The example contains six synthetic messages, five nodes, and four Markdown resources. It contains no real user chat. The current viewer and example labels are primarily Chinese; this documentation is bilingual.
 
-Extract the ZIP and copy the complete `chat-archify-pro` folder into your host's skills directory, for example `~/.codex/skills/`. Keep all assets, scripts, references, tests and agent metadata. The entry point is `~/.codex/skills/chat-archify-pro/SKILL.md`.
+## Install and use
+
+Download `chat-archify-pro.zip` from the [v0.7.0 release](https://github.com/Wyyyyuu/chat-archify-pro/releases/tag/v0.7.0). Extract the `chat-archify-pro` folder into your host's skills directory. In Codex, that is normally `~/.codex/skills/`; restart or reload skills if needed.
+
+The repository, archive, and invocation ID retain the historical `-pro` suffix for compatibility. **There is now one full public version: no Lite/Pro feature split, purchase, or license key is required to use it.** Back up and replace an existing copy rather than installing two copies of the same skill.
+
+Generation requires **Python 3.9+**, **Node.js 18+**, and a separately installed [Archify](https://github.com/tt-a1i/archify) runtime. The integration was tested with Archify `2.17.0-dev.1`. The generated HTML needs only a browser with JavaScript enabled. Your AI host supplies the model; this repository does not include an LLM API or credits.
+
+Then ask your AI:
 
 ```text
-Use $chat-archify-pro to map the conversation I specify. Preserve branches, decisions, changes, source evidence and resource links.
+Use $chat-archify-pro to organize this project's available conversations.
+Show the main stages, key decisions, failed approaches, and unfinished work.
+Attach relevant files with a short explanation of their purpose.
+Generate a local interactive HTML and report gaps in the source coverage.
 ```
 
-The bundled agent metadata sets `allow_implicit_invocation: false`. Other hosts may not recognize this setting. Unavailable history requires a user-provided export; summaries must not be presented as verbatim messages.
+No code repository? Try:
 
-## Reproduce the demo
+```text
+Use $chat-archify-pro to map this long conversation.
+Show topics, alternatives, decisions, and open questions.
+There are no project files; leave resources empty where none exist.
+```
 
-Generation requires Python 3.9+, Node.js 18+, and a separately installed [Archify](https://github.com/tt-a1i/archify). Integration is verified against 2.17.0-dev.1. Archify is neither bundled nor automatically installed. Reading a generated HTML requires a browser supporting JavaScript, SVG and Blob.
+Later:
 
-From this skill directory (quote paths containing spaces):
+```text
+Update the existing map using the new conversation.
+Reuse unchanged summaries, preserve previous decisions and failed approaches,
+and prepare a candidate for review before applying it.
+```
+
+The skill runs only when explicitly requested. It does not monitor chats in the background.
+
+## Reproduce the example
+
+Run from the installed skill directory, replacing the Archify path:
 
 ```sh
-python scripts/build_interactive_demo.py --archify-dir "<directory containing bin/archify.mjs>" --out-dir "demo-output"
+python scripts/build_interactive_demo.py --archify-dir "/path/to/archify" --out-dir "demo-output"
 ```
 
-Open `demo-output/chat-archify-demo.html`. The fictional example contains 5 nodes, 5 edges and 4 Markdown resources. On the node “合并为弹性阅读计划”, inspect “补充阅读资料”, or search the body-only phrase “蓝鲸书签”. Lite retains the fourth resource as a reference and searches titles only; Pro embeds and searches its body.
-
-The helper runs showcase validation, all-route geometry/topology checks, file-byte assertions and Node fake-DOM tests. These do not constitute real-browser or visual acceptance. No network access, dependency installation or server is required by the helper.
-
-For an ordinary conversation without original IDs or attachments, run:
+Open `demo-output/chat-archify-demo.html`. The command builds the example and runs the included programmatic checks. For a plain conversation without project files:
 
 ```sh
-python scripts/build_plain_demo.py --archify-dir "<Archify skill directory>" --out-dir "plain-demo"
+python scripts/build_plain_demo.py --archify-dir "/path/to/archify" --out-dir "plain-demo"
 ```
 
-Open `plain-demo/plain-conversation.html`: four fictional messages, three locally indexed turns and truthful missing-answer states.
+Details: [skill workflow](SKILL.md) · [record format](references/graph-format.md) · [collection](references/automatic-collection.md) · [summary reuse](references/incremental-summaries.md) · [continuation and reviews](references/continuation-and-updates.md).
 
-## Files and boundaries
+## What to expect
 
-- [SKILL.md](SKILL.md) contains the AI workflow; [record format](references/graph-format.md) describes the portable evidence record.
-- Eligible files remain subject to a 25 MiB limit and conservative common credential exclusions, including reused snapshots. This is not an exhaustive secret scanner; placeholder configuration text is supported.
-- Sharing an HTML also shares its embedded messages and file snapshots. Blob links are session-local, not permanent sharing URLs.
-- Markdown uses bundled [Marked under MIT](assets/vendor/marked-LICENSE.md) and controlled DOM rendering. Raw HTML is not executed; remote images are not automatically fetched.
-- READMEs are bilingual; the current viewer and example text are primarily Chinese.
-- One-time-purchase update access uses a separately operated manual-license service. The bundled client checks/downloads a ZIP with SHA-256 validation; it does not install or execute updates. Checkout and deployment are not connected. User content is not automatically published.
+This is a **public preview**, with automated packaging, route, indexing, collection, and summary checks. Full real-browser acceptance is still pending; [the checklist](references/browser-acceptance.md) states what remains to verify. The images above do not imply browser acceptance has passed.
+
+Coverage depends on what the host can actually expose. Unreadable messages, missing attachments, and unverified claims remain visible gaps; inaccessible history cannot be guaranteed recoverable. Collection, model reading, and diagram linking are tracked separately.
+
+Output stays local unless you share it. **Sharing the HTML also shares embedded conversations and file snapshots.** Common credential filtering and a 25 MiB per-file limit help bound inclusion, but review outputs before publishing. Markdown uses bundled [Marked](assets/vendor/marked-LICENSE.md); raw HTML is not executed and remote images are not automatically fetched.
+
+## Help shape Chat Archify
+
+Try it on a messy discussion or a project you have not touched for a while. [Open an issue](https://github.com/Wyyyyuu/chat-archify-pro/issues) with the confusing step, expected behavior, and a small synthetic example. Avoid uploading private conversations or credentials.
+
+If it helps you return to a project with confidence, a star helps other AI builders find it.

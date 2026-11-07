@@ -28,7 +28,11 @@ python scripts/apply_update_review.py "before.html" "candidate.html" "decision.j
 
 ## 获取新 Skill 版本
 
-Pro 提供单文件 `scripts/update_client.py` 客户端；一次性购买的授权发放和 ZIP 更新服务由发行者单独运行，不打包入离线 HTML。当前不接结账，不假称已确认付款。发行者手动发放授权，更新期限由其配置；已有 Skill 与已生成 HTML 仍可离线使用。
+当前只有一个完整公开版本，从 [GitHub Releases](https://github.com/Wyyyyuu/chat-archify-pro/releases) 下载。使用与公开版本下载不需要付款、授权码或更新服务。仓库、包名与调用名保留 `chat-archify-pro`，仅用于兼容旧安装，不表示功能分层。阅读版本说明，备份旧 Skill 后由用户决定替换；不自动安装或运行。
+
+### 历史授权服务（兼容入口）
+
+以下仅适用于已经明确配置旧服务的维护场景，不是当前安装步骤。`scripts/update_client.py` 和仓库的 `paid-updates/` 保留旧授权服务的兼容实现；未部署、不接结账、不启用收费。不要要求普通使用者提供授权文件，也不要默认创建或连接此服务。
 
 只有用户指定服务地址和授权文件后才联网检查／下载。服务使用 HTTPS；明确的 localhost 开发环境例外。客户端显示版本与更新说明，下载后核对 SHA-256 与大小，再保留 ZIP；不自动解压、覆盖 Skill、安装或运行代码。授权文件、服务数据库和发布目录不作为项目附件收录。
 

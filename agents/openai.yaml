@@ -1,5 +1,5 @@
 interface:
-  display_name: "Chat Archify Pro · 对话脉络图"
+  display_name: "Chat Archify · 对话脉络图"
   short_description: "将指定对话整理为演进导航、章节流程图与文件阅读联动的交互工作台"
   default_prompt: "使用 $chat-archify-pro 梳理我指定的对话，生成带来源证据与相关资源的交互脉络图。"
 policy:

@@ -1,3 +1,5 @@
+> **Legacy / 历史兼容代码：** Chat Archify is now fully public; no purchase, license key or this service is needed for usage or public updates. 当前完整版本已公开，此服务不是使用依赖，也未启用收费。
+
 # Pro paid-updates service
 
 This is a small, standard-library-only update service for the Pro skill. It

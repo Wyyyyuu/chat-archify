@@ -171,8 +171,10 @@ class SummaryCacheTests(unittest.TestCase):
         u = sc.get_unit(p, self.cache, p['pending'][0])
         self.assertEqual([m['original_ref'] for m in u['omitted']], ['c3'])
         reading = (self.out / 'reading-pack.md').read_text(encoding='utf-8')
-        self.assertIn('[m4 assistant] 与 m2 正文完全相同', reading)
-        self.assertLess(reading.index('[m3 assistant]'), reading.index('[m4 assistant]'))
+        decoded = sc.transport.decode(json.loads((self.out / 'reading-map.json').read_bytes()))
+        bodies = [e for e in decoded if e['kind']=='message' and e['unit_id']==u['id']]
+        self.assertEqual([e['ref'] for e in bodies], ['m1','m2','m3','m4','m5'])
+        self.assertEqual(bodies[1]['text'], bodies[3]['text'])
         self.assertEqual(len(u['messages']), 5)
 
     def test_similar_text_and_repeated_questions_are_not_deduped(self):
@@ -215,6 +217,118 @@ class SummaryCacheTests(unittest.TestCase):
         u = sc.get_unit(p, self.cache, p['pending'][0])
         self.assertEqual(u['messages'][0]['original_ref'], 'local-message-1')
         self.assertFalse(u['omitted'])
+        entries=json.loads((self.out/'reading-map.json').read_bytes())['entries']
+        self.assertEqual(entries[-1]['phase'],'')
+        self.assertTrue(entries[-1]['label'].endswith('助'))
+
+    def append_existing_turn(self):
+        self.populate()
+        self.doc['messages'].insert(4,message('c3','t1','用户决定暂停上线，先修复备份。'))
+        self.write()
+        return self.prepare()
+
+    def test_same_turn_append_reuses_base_and_survives_reprepare(self):
+        p = self.append_existing_turn()
+        self.assertEqual(len(p['deltas']),1)
+        uid=p['pending'][0]
+        self.assertEqual(p['deltas'][uid]['base_count'],4)
+        entries=sc.transport.decode(json.loads((self.out/'reading-map.json').read_bytes()))
+        messages=[e for e in entries if e['kind']=='message']
+        self.assertEqual([e['ref'] for e in messages],['m5'])
+        self.assertTrue(any(e['kind']=='base_summary' for e in entries))
+        self.assertEqual(self.prepare()['deltas'],p['deltas'])
+
+    def test_delta_accept_retains_prior_points_and_historical_decision(self):
+        p=self.append_existing_turn();uid=p['pending'][0];base=p['deltas'][uid]
+        value={'unit_id':uid,'key':p['head']['units'][uid],'kind':'model_summary_delta','base_key':base['base_key'],
+               'points':[{'text':'暂停发布，备份仍待修复。','refs':['m5']}],
+               'supersedes':[{'point':1,'reason':'新要求暂停发布。','refs':['m5']}]}
+        path=self.base/'delta.json';path.write_bytes(sc.canonical([value]))
+        sc.accept(self.out/'plan.json',path)
+        q=self.prepare();self.assertFalse(q['pending'])
+        saved=sc.load_summary(self.cache,sc.get_unit(q,self.cache,uid))
+        self.assertEqual(len(saved['points']),2)
+        self.assertEqual(saved['points'][0]['text'],base['points'][0]['text'])
+        self.assertEqual(saved['points'][0]['superseded']['refs'],['m5'])
+
+    def test_delta_requires_new_evidence_and_matching_base(self):
+        p=self.append_existing_turn();uid=p['pending'][0];base=p['deltas'][uid]
+        good={'unit_id':uid,'key':p['head']['units'][uid],'kind':'model_summary_delta','base_key':base['base_key'],
+              'points':[{'text':'新结论','refs':['m5']}]}
+        for bad in [{**good,'base_key':'wrong'}, {**good,'points':[{'text':'旧结论','refs':['m1']}]},
+                    {**good,'supersedes':[{'point':1,'reason':'无新证据','refs':['m1']}]},
+                    {**good,'supersedes':[{'point':99,'reason':'不存在','refs':['m5']}]}]:
+            path=self.base/'bad.json';path.write_bytes(sc.canonical([bad]))
+            with self.assertRaises(ValueError):sc.accept(self.out/'plan.json',path)
+        self.assertFalse((self.cache/'summaries'/(p['head']['units'][uid]+'.json')).exists())
+
+    def test_edited_or_inserted_old_message_uses_full_turn(self):
+        self.append_existing_turn()
+        self.doc['messages'][1]['content']='这条旧消息变了。'
+        self.write();p=self.prepare();self.assertFalse(p['deltas'])
+        decoded=sc.transport.decode(json.loads((self.out/'reading-map.json').read_bytes()))
+        self.assertEqual(len([e for e in decoded if e['kind']=='message']),5)
+
+    def test_delta_profile_change_does_not_reuse_old_summary(self):
+        self.append_existing_turn()
+        p=self.prepare(profile='other-instructions')
+        self.assertFalse(p['deltas']);self.assertEqual(len(p['pending']),2)
+
+    def test_lossless_duplicate_bodies_keep_roles_occurrences_and_negation(self):
+        body=('发布仍未完成，备份需修复。\n'*20)+'〔同文 B1〕'
+        entries=[{'unit_id':'a','ref':'m1','role':'user','text':body},
+                 {'unit_id':'b','ref':'m2','role':'assistant','text':body},
+                 {'unit_id':'b','ref':'m3','role':'assistant','text':body.replace('未完成','已完成')}]
+        pack=sc.transport.encode(entries)
+        self.assertEqual(sc.transport.decode(pack),entries)
+        self.assertTrue(pack['dictionary'])
+        rendered=sc.transport.render(pack)
+        self.assertLess(sum(map(len,rendered)),sum(len(e['text']) for e in entries))
+        self.assertIn('已完成',rendered[-1])
+
+    def test_repeated_paragraph_retains_changed_surrounding_text(self):
+        common='旧方案仍待审核。'*30
+        entries=[{'text':'第一次\n\n'+common+'\n\n待办甲'}, {'text':'第二次\n\n'+common+'\n\n待办乙'}]
+        packed=sc.transport.encode(entries)
+        self.assertEqual(sc.transport.decode(packed),entries)
+        self.assertEqual(len(packed['dictionary']),1)
+
+    def test_corrupt_delta_base_is_not_trusted(self):
+        p=self.append_existing_turn();uid=p['pending'][0]
+        file=self.cache/'units'/(p['deltas'][uid]['base_key']+'.json')
+        value=json.loads(file.read_bytes());value['messages'][0]['text']='篡改'
+        file.write_bytes(sc.canonical(value))
+        with self.assertRaisesRegex(ValueError,'changed'):self.prepare()
+
+    def test_short_aliases_bind_to_exact_plan_without_model_hashes(self):
+        p=self.prepare();uid=p['pending'][0];alias=p['head']['aliases'][uid]
+        value={'unit_id':alias,'kind':'model_summary','points':[{'text':'待发布。','refs':['m4']}]}
+        path=self.base/'short.json';path.write_bytes(sc.canonical([value]))
+        with self.assertRaisesRegex(ValueError,'plan-bound'):sc.accept(self.out/'plan.json',path)
+        path.write_bytes(sc.canonical({'plan':p['head_sha256'],'summaries':[value]}))
+        sc.accept(self.out/'plan.json',path)
+        q=self.prepare();self.assertIn(uid,q['reused'])
+        self.assertEqual(sc.resolve_unit(p,alias),uid)
+        with self.assertRaises(ValueError):sc.resolve_unit(p,'U90000')
+
+    def test_delta_short_alias_still_rejects_explicit_wrong_key(self):
+        p=self.append_existing_turn();uid=p['pending'][0]
+        value={'unit_id':p['head']['aliases'][uid],'kind':'model_summary_delta','key':'wrong',
+               'points':[{'text':'暂停发布。','refs':['m5']}]}
+        path=self.base/'short-delta.json';path.write_bytes(sc.canonical({'plan':p['head_sha256'],'summaries':[value]}))
+        with self.assertRaises(ValueError):sc.accept(self.out/'plan.json',path)
+        del value['key'];path.write_bytes(sc.canonical({'plan':p['head_sha256'],'summaries':[value]}))
+        sc.accept(self.out/'plan.json',path)
+        q=self.prepare();self.assertFalse(q['pending'])
+
+    def test_old_alias_submission_rejected_after_plan_replaced(self):
+        p=self.prepare()
+        value={'plan':p['head_sha256'],'summaries':[{'unit_id':'U1','kind':'model_summary',
+               'points':[{'text':'旧结论。','refs':['m1']}]}]}
+        path=self.base/'old.json';path.write_bytes(sc.canonical(value))
+        self.doc['messages'].insert(0,message('new','new-turn','新插入一轮','user','user'))
+        self.write();self.prepare()
+        with self.assertRaisesRegex(ValueError,'stale or different'):sc.accept(self.out/'plan.json',path)
 
 
 if __name__ == '__main__': unittest.main()
