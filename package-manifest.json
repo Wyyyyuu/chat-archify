@@ -10,7 +10,7 @@
     "assets/project-tools.js": "42d99c38b8c3ec6ba01234e25d013d0f1a765314e2d147dbd26943e854c04d0b",
     "assets/showcase/example-flow.png": "b6267d9ebf0c6bcfd3845c3a3821e1d7003baf4047d00f22372f6d31d8137335",
     "assets/showcase/example-flow.svg": "bb6ae5cdea2e7e3168934306f7b22ea9ba99d35aae4335349b2705ed82878374",
-    "assets/showcase/README.md": "a863558f6415f045a6acb3d1c23320f0ab554f98be4f0c07cd05335328722331",
+    "assets/showcase/README.md": "e6fc217cb13f1d682697323f8905fa0432a04bb2d3611270de4773e938f5a682",
     "assets/showcase/workspace-en.png": "2995bc6182c04067c25764e2217b636eddbad4ab8cacb122b11e83f51b536cd7",
     "assets/showcase/workspace-en.svg": "76484c7deeda9a81e1c41fc9e5ae9053463740e9cb11265cb893fb5058b92aa1",
     "assets/showcase/workspace-zh.png": "e974b32de99b2508ff6cf11328d91157eed4bd4af10e32b3dfcdefc5c2fadf4d",
@@ -32,7 +32,7 @@
     "examples/reading-plan/manifest.json": "f818cac48a69bf0cbc08eb27ea4ef902b875bb4397ec33b300af709dca3f5a2f",
     "examples/reading-plan/README.md": "0e6629951c304f223536cd751e6e4eadf266a711cabafe26be247396c4d1ed88",
     "examples/reading-plan/workflow-v2.json": "855644e0b933e065bba17b8f9d3d6704f636508c8b59f44835cceffd4362f0d6",
-    "README.md": "bd06c0193a77ca53160169496a0d0f3802fb8a4703cba4b418bd3e6472f7791d",
+    "README.md": "477cd70bf1f8af16a0b3672ddb42b49f457d55859a6c706b52eb49f05fd17e5a",
     "README.zh-CN.md": "09cb64d8778ddf97b2470007fd61ee7732fbc830c66792ecebf4abb120710464",
     "references/authoring.md": "f25067da041ea2bc2b5968f17ab61e9ebd708da6db40e785dedc2597b087493a",
     "references/automatic-collection.md": "680063c19262c21ebd40b7916d5bac41db9944d478f26f47e0ff5400b00d9c23",
@@ -80,6 +80,8 @@
     "tests/test_project_tools.py": "9a151eafddb8c3452e8ac9d140072dc0b68fc53e8cb47b3c21061dca94595e0c",
     "tests/test_summary_cache.py": "93983d4bc645b168bbee11a66b6252316511c45afb65cbec57b64702d53447f6",
     "tests/test_update_client.py": "74aeedef8e1f88fd25bbd257dfd9163ae5d2ea8aaf160f13e0a36378faeb9cb5",
-    "tests/test_workbench.py": "3860a695b44a054dca7fd03009c044f3775d4b9da0a2906899332e9aa2dc4368"
+    "tests/test_workbench.py": "3860a695b44a054dca7fd03009c044f3775d4b9da0a2906899332e9aa2dc4368",
+    "assets/showcase/example-flow-en.svg": "92dee0d14bcbd7d16252a90e0e882c8023344b1f34baa657dc2a9daa7eb7f860",
+    "assets/showcase/example-flow-en.png": "64533f9d5ae9e3c1a6504dc8840acaa67a0e6bed4544dd1ffb99dc833207d441"
   }
 }

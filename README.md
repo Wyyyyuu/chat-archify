@@ -40,9 +40,9 @@ Chat Archify is a skill for answering those questions. It turns the available co
 
 **3. Continue with context.** Export a handoff for another AI, or update the existing map after more work. Stable identities keep records connected; unchanged summaries do not need to be generated again.
 
-![Actual basic-renderer SVG export of the fictional reading-plan record](assets/showcase/example-flow.png)
+![English diagram of the fictional reading-plan record](assets/showcase/example-flow-en.png)
 
-*Actual basic-renderer export: one goal, two candidate approaches, a combined plan, and a future review. The full HTML adds the workspace, file reader, conversation index, and handoff tools. “Proposed” is deliberately not presented as “verified.”*
+*English translation of the basic-renderer export: one goal, two candidate approaches, a combined plan, and a future review. The full HTML adds the workspace, file reader, conversation index, and handoff tools. “Proposed” is deliberately not presented as “verified.”*
 
 ### More than a diagram
 
