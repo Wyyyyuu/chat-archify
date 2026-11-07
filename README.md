@@ -6,9 +6,9 @@ Turn long conversations into an interactive map of branches, decisions and chang
 
 ## Release status and comparison
 
-Current version: **0.4.0 · local preview (2026-10-11)**. Implementation and program-level checks are complete. Real-browser visual, focus, touch, download and storage acceptance remains pending. This is a prerelease, not a claim of complete browser acceptance.
+Current release: **0.6.1 · prerelease (2026-11-07)**. Program-level checks pass; real-browser visual, focus, touch, download and storage acceptance remains pending.
 
-Download `chat-archify-pro.zip` from [GitHub Releases](https://github.com/Wyyyyuu/chat-archify-pro/releases/tag/v0.4.0). Lite is public; the Pro repository and release assets require authorized GitHub access. One-time purchase checkout is not connected, and a commercial update-entitlement duration has not been fixed.
+Download `chat-archify-pro.zip` from [GitHub Releases](https://github.com/Wyyyyuu/chat-archify-pro/releases/tag/v0.6.1). Lite is public; Pro requires authorized GitHub access. One-time purchase checkout is not connected, and the commercial update-entitlement duration is not fixed.
 
 | Capability | Lite (free) | Pro |
 | --- | --- | --- |
@@ -30,9 +30,19 @@ Multiple related conversations and chapters; all eligible file snapshots; full-t
 
 Both editions retain complete nodes and relationships, crossing checks, node evidence, formatted/raw Markdown, downloads, offline HTML and structured JSON. The free quota does not truncate the conversation map.
 
-Pro 0.4.0 adds adjustable panel widths with keyboard support and local preferences, a guided three-panel start with the overview flowchart centered in its panel, and concise details. The first three linked resources stay visible; expand the rest when needed. Metadata and source records share one closed disclosure. Returning from a file restores disclosure states and scroll position. Clear type hierarchy and colored, text-labeled status badges improve scanning. Compact checked flowcharts and functional groups for code files remain available. AI edits the evidence-backed record; the packager reuses archived file bytes. Use **Continuation pack** to hand off concise progress, decisions, open questions and file purposes to another AI. **Review update** compares an old page with the candidate before you approve or reject it; application checks the exact reviewed input hashes.
+Pro retains adjustable panel widths with keyboard support and local preferences, a guided three-panel start with the overview flowchart centered in its panel, and concise details. The first three linked resources stay visible; expand the rest when needed. Metadata and source records share one closed disclosure. Returning from a file restores disclosure states and scroll position. Clear type hierarchy and colored, text-labeled status badges improve scanning. Compact checked flowcharts and functional groups for code files remain available. AI edits the evidence-backed record; the packager reuses archived file bytes. Use **Continuation pack** to hand off concise progress, decisions, open questions and file purposes to another AI. **Review update** compares an old page with the candidate before you approve or reject it; application checks the exact reviewed input hashes.
+
+Version 0.4.1 refreshes the workspace with a quiet dotted canvas, consistent line icons, clearer file cards and a directly accessible conversation button. Selection highlights only recorded upstream paths. Simple verified forks and joins use two lanes; complex graphs keep their checked compact layout. Every original event, relationship and archived file is preserved. Extra tools remain available in **More tools**.
 
 The interface is a fixed template customized through project data, not a new UI generated per project. Small screens use explicit overview/flow/detail views. See the [workbench contract](references/workbench.md).
+
+Version 0.6.1 retains every eligible message by default, replacing only exact repeated commentary within a turn with an ordered reference. It removes keyword-based omissions that could hide decisions, setbacks or unfinished work. Incremental summary caching, full original archives, targeted rereads and pinned evidence remain available; older selection-policy summaries are invalidated. Natural-language device/login codes are also excluded. The short Skill entrypoint loads detailed instructions on demand. Savings come primarily from reuse, not first-pass truncation; semantic correctness still requires source review. See [Incremental summaries](references/incremental-summaries.md).
+
+Version 0.5.0 adds an automated Codex host-tool collector with active/archive pagination, resumable checkpoints, bounded retries, public-message-only exports and credential filtering. Machine checks reconcile page chains, saved messages, export hashes and packaged sources. Pending pages or inconsistent data block packaging; actual provider gaps require an explicit partial-coverage mode and remain visible in the index. This checks the tool-visible scope and local consistency, not inaccessible or deleted history. See [Automatic collection](references/automatic-collection.md).
+
+Version 0.4.3 introduced the source-coverage workflow: enumerate relevant chats, exhaust both discovery and message pagination, record exclusions and unread ranges, and reconcile sources with modules. Version 0.5.0 automates those collection and consistency checks. Checked coverage and displayed excerpts remain distinct; deleted or inaccessible history remains a stated gap.
+
+Version 0.4.2 fixes module-scoped conversation indexes: confirmed links are the default, same-source candidates require an explicit action, matching messages within long turns are highlighted, and picker filters and breadcrumb return state are corrected. Targeted conversation recovery can refresh named chat exports while keeping all other archived file bytes.
 
 Conversation cards use the current turn’s user question as their title. Click a card to open a large reading dialog within the same page, with separate user, assistant and saved-summary messages. Close or press Escape to return to the original index or context with filters and position preserved. Local extraction requires no model calls; saved summaries remain labeled, and stages with no linked excerpts show an explicit empty state.
 

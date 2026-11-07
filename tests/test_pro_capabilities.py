@@ -73,7 +73,33 @@ def main():
         package(manifest_path, refreshed)
         after = {f['path']: f['sha256'] for f in read_payload(refreshed)['files'].values()}
         assert after[str(changed.resolve())] != before[str(changed.resolve())]
-        print(json.dumps({'status': 'passed', 'checks': ['two chapters retain all nodes and edges', 'two conversation tasks indexed', 'all four artifacts embedded', 'snapshot reuse preserves previous file hashes', 'relocated records preserve archived IDs and bytes', 'explicit regeneration reads current bytes']}))
+        # Recover one newly retrieved conversation without silently replacing
+        # any archived artifacts from their current filesystem versions.
+        recovered = source / 'recovered-conversation.md'
+        recovered.write_text(transcript.replace('22222222-2222-4222-8222-222222222222', '33333333-3333-4333-8333-333333333333'), encoding='utf-8')
+        record['sources'].append({**second, 'id': 'recovered-chat', 'uri': recovered.name,
+                                  'locator': 'Task ID: 33333333-3333-4333-8333-333333333333'})
+        (source / 'multi-record.json').write_text(json.dumps(record, ensure_ascii=False), encoding='utf-8')
+        # A new URI cannot be loaded without an explicit, valid refresh.
+        try: package(manifest_path, work / 'unapproved.html', snapshot_from=original)
+        except ValueError as error: assert 'snapshot' in str(error).lower()
+        else: raise AssertionError('Unknown snapshot URI must not refresh implicitly')
+        recovered_page = work / 'recovered.html'
+        package(manifest_path, recovered_page, snapshot_from=original, refresh_conversations=[recovered])
+        recovered_payload = read_payload(recovered_page)
+        assert all(recovered_payload['files'][key] == value for key, value in payload['files'].items())
+        assert '33333333-3333-4333-8333-333333333333' in {entry['task_id'] for entry in recovered_payload['conversations']}
+        for snapshots, requested, message in [(None, [recovered], 'requires --snapshot-from'),
+                                              (recovered_page, [changed], 'must name conversation sources')]:
+            try: package(manifest_path, work / 'invalid-refresh.html', snapshot_from=snapshots, refresh_conversations=requested)
+            except ValueError as error: assert message in str(error)
+            else: raise AssertionError('Refresh outside conversation scope must fail')
+        recovered.write_text('api_key = "sk-' + 'Z' * 52 + '"\n', encoding='utf-8')
+        package(manifest_path, work / 'guarded.html', snapshot_from=recovered_page, refresh_conversations=[recovered])
+        guarded = read_payload(work / 'guarded.html')
+        assert next(file for file in guarded['files'].values() if file['path'] == str(recovered.resolve()))['status'] == 'excluded'
+        assert not any(entry['task_id'] == '33333333-3333-4333-8333-333333333333' for entry in guarded['conversations'])
+        print(json.dumps({'status': 'passed', 'checks': ['two chapters retain all nodes and edges', 'two conversation tasks indexed', 'all four artifacts embedded', 'snapshot reuse preserves previous file hashes', 'relocated records preserve archived IDs and bytes', 'explicit regeneration reads current bytes', 'explicit conversation recovery preserves other snapshots', 'invalid refresh requests rejected', 'refreshed sources retain credential filtering']}))
 
 
 if __name__ == '__main__':

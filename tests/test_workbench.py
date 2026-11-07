@@ -6,6 +6,7 @@ from pathlib import Path
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
 from workbench_data import navigation_data, vertical_layout, validate_groups, initial_target
+from branch_layout import branch_layout
 
 
 class WorkbenchTests(unittest.TestCase):
@@ -48,6 +49,27 @@ class WorkbenchTests(unittest.TestCase):
 
     def test_start_requires_existing_node(self):
         with self.assertRaisesRegex(ValueError,'start'):initial_target({'start':{'chapter':'overview','node':'no'}},self.packed)
+
+    def test_unequal_fork_keeps_every_event_and_relationship(self):
+        record={'nodes':[{'id':x} for x in ['a','b','c','d','e','f']],
+                'edges':[{'from':a,'to':b,'type':'adds','confidence':'explicit','reason':'recorded'}
+                         for a,b in [('a','b'),('b','c'),('b','d'),('d','e'),('c','f'),('e','f')]]}
+        before=copy.deepcopy(record)
+        layout=branch_layout(record)
+        self.assertEqual(record,before)
+        self.assertEqual(layout['audit'],{'nodes':6,'edges':6,'crossings':0,'node_crossings':0})
+        self.assertEqual([{k:v for k,v in edge.items() if k not in ('id','points')} for edge in layout['edges']],record['edges'])
+        nodes={n['id']:n for n in layout['nodes']}
+        self.assertEqual(nodes['c']['y'],nodes['d']['y'])
+        self.assertNotEqual(nodes['c']['x'],nodes['d']['x'])
+        self.assertGreater(nodes['f']['y'],nodes['e']['y'])
+
+    def test_unjoined_or_ambiguous_forks_keep_checked_fallback(self):
+        self.assertIsNone(branch_layout(self.record))
+        layout=vertical_layout(b'',self.record,prefer_branches=True)
+        self.assertEqual(layout['strategy'],'compact-vertical')
+        self.assertEqual(len(layout['nodes']),3)
+        self.assertEqual(len(layout['edges']),2)
 
     def test_compact_geometry_retains_full_topology(self):
         viewer=b'''<svg><g data-node-id="a"><rect x="0" y="0" width="100" height="60"/></g>

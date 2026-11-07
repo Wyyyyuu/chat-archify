@@ -70,6 +70,8 @@ python scripts/package_interactive.py "<output-dir>/manifest.json" "<output-dir>
 
 package_interactive.py 校验记录、文件引用、viewer 几何并生成 SHA-256 回执。输入资源文件按 evolution.json 所在目录解析并嵌入页面；用户浏览的原件不会被页面修改。应核对嵌入字节与来源、Markdown 互链、来源覆盖、章节和所有关系。对既有页面仅刷新 UI 时可用 --snapshot-from <已有交互HTML> 复用既有附件快照；迁移输出目录时，相同章节内原有相对 URI 继续绑定原快照 ID 与字节。新增 URI 不会静默读取当前文件，必须显式刷新来源后打包。
 
+只补收聊天、同时保留所有其他历史文件时，使用 `--snapshot-from old.html --refresh-conversation <聊天导出绝对路径>`；有多个导出则重复该参数。所指路径必须是记录中的 `kind: "conversation"` 来源。只读取明确指定的聊天，其余附件继续使用旧字节；新聊天同样接受凭据与大小检查。更新后的节点证据须引用实际轮次／消息 ID 或真实位置，并核对原有消息身份仍可迁移，不能仅新增导出文件却不建立模块关联。
+
 ## 完整 UI 行为与限制
 
 工作台固定布局、导航字段、功能文件分组和真实项目验收见 [章节工作台](workbench.md)。

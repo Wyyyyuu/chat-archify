@@ -91,6 +91,13 @@ class ConversationIdentitySmoke(unittest.TestCase):
         self.assertEqual([_entry_locator_match(e,locator+'; L2-L2',rows) for e in rows], [False,True,False])
         self.assertEqual([_entry_locator_match(e,'task-a turn-1 msg2',rows) for e in rows], [False,True,False])
 
+    def test_task_only_locator_is_a_candidate_not_a_module_match(self):
+        from conversation_index import _entry_locator_match
+        rows=[{'task_id':'task-a','turn_id':'turn-1','message_id':'msg1','line_start':1,'line_end':2},
+              {'task_id':'task-a','turn_id':'turn-2','message_id':'msg2','line_start':4,'line_end':5}]
+        self.assertEqual([_entry_locator_match(e,'Task ID: task-a',rows) for e in rows],[False,False])
+        self.assertEqual([_entry_locator_match(e,'Task ID: task-a; L4-L4',rows) for e in rows],[False,True])
+
     def test_appending_a_repeated_question_keeps_known_identity_aliases(self):
         before=build_conversation_index([chapter()], {'conversation-file':{'id':'f','text':'User: continue\nAssistant: one\n'}})
         after=build_conversation_index([chapter()], {'conversation-file':{'id':'f','text':'User: continue\nAssistant: one\nUser: continue\nAssistant: two\n'}})
@@ -104,6 +111,19 @@ class ConversationIdentitySmoke(unittest.TestCase):
         rows=build_conversation_index([first,second], {'conversation-file':{'id':'f','text':text}})
         self.assertEqual(len(rows),2)
         self.assertEqual(first['record']['sources'][0]['conversation_entry_ids'],second['record']['sources'][0]['conversation_entry_ids'])
+
+    def test_collected_context_orders_old_excerpt_and_reuses_legacy_item(self):
+        first=chapter(); second=chapter(source_id='collected'); second['id']='collected'
+        second['record']['sources'][0]['file_id']='new-file'
+        before={'task_id':'task-a','turn_id':'turn-a','message_id':'item-2','role':'assistant','content':'answer'}
+        recovered=[{'task_id':'task-a','turn_id':'turn-a','message_id':'msg-user','role':'user','content':'question','collection_order':0},
+                   {**before,'message_id':'','source_item_id':'item-2','collection_order':1}]
+        rows=build_conversation_index([first,second],{'conversation-file':{'id':'old','text':json.dumps({'messages':[before]})},
+            'new-file':{'id':'new','text':json.dumps({'messages':recovered})}})
+        self.assertEqual(len(rows),2)
+        ordered=sorted(rows,key=lambda e:e['conversation_order'])
+        self.assertEqual([entry['text'] for entry in ordered],['question','answer'])
+        self.assertEqual(first['record']['sources'][0]['conversation_entry_ids'],[ordered[1]['id']])
 
     def test_export_headers_do_not_become_body_or_hide_assistant_role(self):
         text='## 2026-01-01T10:00 · 助手交付陈述\n任务：公开示例标题\n任务 ID: task-a\n轮次 ID: turn-a\n消息 ID: msg-a\n\n回答正文\n```\nTask ID: code-example\n```\n'

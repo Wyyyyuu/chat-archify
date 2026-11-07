@@ -1,0 +1,11 @@
+'use strict';
+const fs=require('node:fs'),path=require('node:path'),journal=require('./collection_checkpoint.cjs'),core=require('./collect_conversations.cjs');
+const directory=process.argv[2],output=process.argv[3];
+if(!directory||!output)throw new Error('Usage: node restore_collection.cjs <checkpoint-directory> <state.json>');
+const names=fs.readdirSync(directory).filter(name=>/^checkpoint-\d{6}\.json$/.test(name)).sort();
+if(!names.length)throw new Error('No collection checkpoints');
+const state=journal.restore(names.map(name=>JSON.parse(fs.readFileSync(path.join(directory,name),'utf8'))));
+const audit=core.audit(state);
+fs.mkdirSync(path.dirname(path.resolve(output)),{recursive:true});
+fs.writeFileSync(output,JSON.stringify(state,null,2)+'\n');
+process.stdout.write(JSON.stringify({checkpoints:names.length,status:audit.status,counts:audit.counts})+'\n');

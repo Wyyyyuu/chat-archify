@@ -10,7 +10,7 @@ import base64
 import json
 import re
 from typing import Iterable, Optional
-from urllib.parse import unquote, urlsplit
+from urllib.parse import unquote, urlsplit, parse_qsl
 
 
 CREDENTIAL_NOTE = "检测到可能的凭据，仅保留原始引用与位置。"
@@ -225,6 +225,27 @@ def content_credential_reason(text: str) -> Optional[str]:
         return None
     if _PRIVATE_KEY.search(text):
         return CREDENTIAL_NOTE
+    # Natural-language device/login codes are not KEY=value assignments.
+    # Require an explicit credential label and an actual short-code shape.
+    if re.search(r'(?:设备(?:登录|授权|验证)?码|登录码|授权码|验证码|'
+                 r'device\s+(?:login\s+|authorization\s+)?code|verification\s+code|one.time\s+code)'
+                 r'\s*(?:是|为|is|[:：=])\s*[:：]?\s*[`\"\x27]*'
+                 r'(?:[A-Z0-9]{4}-[A-Z0-9]{4}|[0-9]{6,10})(?![A-Z0-9-])', text, re.I):
+        return CREDENTIAL_NOTE
+    for match in re.finditer(r'https?://[^\s"\x27<>]+', text, re.I):
+        try:
+            url = urlsplit(match.group(0))
+            auth_path = bool(re.search(r'(?:oauth|authoriz|callback|device|login)', url.path, re.I))
+            for key, value in parse_qsl(url.query, keep_blank_values=True):
+                credential_field = key.casefold() in {'user_code', 'device_code', 'access_token', 'refresh_token', 'id_token', 'client_secret'}
+                if (credential_field or key.casefold() == 'code' and auth_path) and value and not _looks_placeholder(value):
+                    return CREDENTIAL_NOTE
+        except ValueError:
+            pass
+    for match in re.finditer(r'(?i)["\x27]?\b(?:user[_-]?code|device[_-]?code)\b["\x27]?\s*[:=]\s*(["\x27]?[^\s,;"\x27<>]+)', text):
+        value = match.group(1).strip('"\x27')
+        if len(value) >= 4 and not _looks_placeholder(value):
+            return CREDENTIAL_NOTE
     for match in re.finditer(r'(?i)\b(?:postgres(?:ql)?|mysql|mongodb(?:\+srv)?|redis|amqps?)://[^\s"\x27<>]+',text):
         try:
             password=urlsplit(match.group(0)).password
@@ -266,7 +287,33 @@ def credential_reason(
         if reason:
             return reason
     if data is not None:
-        reason = content_credential_reason(decode_text(data) or "")
+        text = decode_text(data) or ""
+        # Chat JSON escapes quotes/newlines inside otherwise safe code examples.
+        # Inspect decoded message strings rather than treating serialization
+        # backslashes as part of a secret assignment value. Keep key/value
+        # context for actual secret fields in any nested metadata.
+        try:
+            value = json.loads(text)
+        except (ValueError, TypeError):
+            value = None
+        if isinstance(value, dict) and isinstance(value.get('messages'), list):
+            def inspect(item):
+                if isinstance(item, str):
+                    return content_credential_reason(item)
+                if isinstance(item, list):
+                    return next((reason for child in item if (reason := inspect(child))), None)
+                if isinstance(item, dict):
+                    if 'auths' in item and content_credential_reason(json.dumps({'auths': item['auths']})):
+                        return CREDENTIAL_NOTE
+                    for key, child in item.items():
+                        if content_credential_reason(str(key)) or inspect(child):
+                            return CREDENTIAL_NOTE
+                        if isinstance(child, str) and content_credential_reason(str(key) + '=' + child):
+                            return CREDENTIAL_NOTE
+                return None
+            reason = inspect(value)
+        else:
+            reason = content_credential_reason(text)
         if reason:
             return reason
     return None

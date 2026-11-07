@@ -19,6 +19,7 @@ from check_routes import audit_file
 from conversation_index import build_conversation_aliases, build_conversation_index
 from workbench_data import vertical_layout, validate_groups, navigation_data, initial_target
 from credential_guard import credential_reason, decode_text
+from collection_audit import validate_package_collection
 
 
 def encode(data):
@@ -109,13 +110,17 @@ def _validate_migration_project(manifest_project_id, payload, label):
         raise ValueError(f'{label} must have the same project_id as the manifest')
 
 
-def package(manifest_path, output, snapshot_from=None, identity_from=None):
+def package(manifest_path, output, snapshot_from=None, identity_from=None, refresh_conversations=()):
     manifest_path,output=Path(manifest_path).resolve(),Path(output).resolve()
     manifest=json.loads(manifest_path.read_text(encoding='utf-8-sig'))
     project_id=manifest.get('project_id')
     if 'project_id' in manifest and (not isinstance(project_id,str) or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._:-]{0,127}',project_id)):
         raise ValueError('project_id must be a stable nonempty ASCII identifier of at most 128 characters')
     base=manifest_path.parent
+    refresh_paths={str(Path(path).resolve()) for path in refresh_conversations}
+    refreshed_paths=set()
+    if refresh_paths and not snapshot_from:
+        raise ValueError('--refresh-conversation requires --snapshot-from')
     chapters=manifest['chapters']
     assert chapters and len({c['id'] for c in chapters})==len(chapters)
     pool={}; reports=[]; aliases={}; snapshots={}
@@ -155,6 +160,14 @@ def package(manifest_path, output, snapshot_from=None, identity_from=None):
         if not uri:return
         path=local_path(uri,record_base)
         if path is None:return
+        # One physical source may also appear as an artifact in an earlier chapter.
+        # Honor its explicit refresh consistently, then require a conversation
+        # source reference before writing any output (checked below).
+        refresh=str(path) in refresh_paths
+        if refresh:
+            if not path.is_file():
+                raise ValueError('Requested conversation export is not a readable file')
+            if item.get('kind')=='conversation':refreshed_paths.add(str(path))
         if str(path) in aliases:
             item['chapter_id']=aliases[str(path)]
             return
@@ -163,7 +176,7 @@ def package(manifest_path, output, snapshot_from=None, identity_from=None):
         if key in pool:return
         file={'id':key,'path':str(path),'name':path.name,'status':'missing'}
         pool[key]=file
-        if str(path) in snapshots:
+        if str(path) in snapshots and not refresh:
             preserved=copy.deepcopy(snapshots[str(path)])
             preserved.pop('text',None)
             if preserved['status']=='embedded':
@@ -182,7 +195,7 @@ def package(manifest_path, output, snapshot_from=None, identity_from=None):
             preserved['id']=key
             pool[key]=preserved
             return
-        if snapshot_from:
+        if snapshot_from and not refresh:
             raise ValueError(f'No prior snapshot for {path}; explicitly refresh sources to add files')
         if not path.exists():return
         reason=credential_reason(path.name)
@@ -234,11 +247,15 @@ def package(manifest_path, output, snapshot_from=None, identity_from=None):
         for n in data['nodes']:
             n['search_text']=' '.join(str(x) for x in [n['title'],n['summary'],n.get('reason',''),n['branch'],*[a['label'] for a in n['artifacts']]]).lower()
         digest=hashlib.sha256(viewer_bytes).hexdigest()
-        graph_layout=vertical_layout(viewer_bytes,data)
+        overview_id=manifest.get('navigation',{}).get('source_chapter')
+        graph_layout=vertical_layout(viewer_bytes,data,prefer_branches=ch['id']!=overview_id)
         packed.append({'id':ch['id'],'label':ch['label'],'record':data,'viewer':encode(viewer_bytes),'viewer_sha256':digest,'layout':graph_layout})
         reports.append({'chapter':ch['id'],'nodes':len(data['nodes']),'edges':len(data['edges']),'viewer_sha256':digest,'record_viewer_topology':topology,'all_pair_route_audit':geometry,'workbench_route_audit':graph_layout['audit']})
+    if refreshed_paths != refresh_paths:
+        raise ValueError('--refresh-conversation must name conversation sources in the manifest records')
     conversations=build_conversation_index(packed,pool)
     payload={'title':manifest['title'],'chapters':packed,'files':pool,'conversations':conversations,'created_at':datetime.now().isoformat(timespec='seconds')}
+    payload['collection_audit']=validate_package_collection(manifest,base,packed,pool)
     if project_id is not None:payload['project_id']=project_id
     if migration_payload:
         group_aliases,entry_aliases=build_conversation_aliases(migration_payload,conversations)
@@ -269,4 +286,5 @@ if __name__=='__main__':
     parser.add_argument('manifest');parser.add_argument('output')
     parser.add_argument('--snapshot-from',help='Reuse exact attachments from an existing interactive HTML and migrate associations')
     parser.add_argument('--identity-from',help='Migrate stable conversation identities from an existing interactive HTML')
-    args=parser.parse_args();package(args.manifest,args.output,args.snapshot_from,args.identity_from)
+    parser.add_argument('--refresh-conversation',action='append',default=[],help='With --snapshot-from, refresh this conversation export only; may be repeated. Other snapshots stay archived.')
+    args=parser.parse_args();package(args.manifest,args.output,args.snapshot_from,args.identity_from,args.refresh_conversation)

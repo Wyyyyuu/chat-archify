@@ -46,6 +46,31 @@ def write_viewer(path: Path) -> None:
 
 
 class CredentialGuardUnitTests(unittest.TestCase):
+    def test_natural_language_device_codes_are_excluded(self):
+        for text in ('设备登录码是 `AB12-CD34`。', '验证码为 872193。',
+                     'Device authorization code is QW12-ER34'):
+            self.assertEqual(credential_reason('chat.txt', text.encode()), CREDENTIAL_NOTE)
+        for text in ('找回密码使用 8 位数字验证码，10 分钟有效。', 'Device code is YOUR_CODE'):
+            self.assertIsNone(credential_reason('chat.txt', text.encode()))
+
+    def test_short_device_codes_and_authorization_urls_are_excluded(self):
+        for text in ('https://provider.example/device?user_code=AB12-CD34',
+                     'https://provider.example/oauth/callback?code=AB12CD34',
+                     'device_code: QW12-ER34'):
+            self.assertEqual(credential_reason('chat.txt', text.encode()), CREDENTIAL_NOTE)
+        self.assertIsNone(credential_reason('chat.txt', b'https://provider.example/device?user_code=YOUR_CODE'))
+
+    def test_conversation_json_checks_raw_strings_and_secret_metadata(self):
+        safe={'messages':[{'content':'Use OPENAI_API_KEY="YOUR_API_KEY"\nRun code with process.env.OPENAI_API_KEY.'}]}
+        self.assertIsNone(credential_reason('chat.json', json.dumps(safe).encode()))
+        safe['messages'][0]['content']='OPENAI_API_KEY="sk-proj-abcdefghijklmnopqrstuvwxyz0123456789"'
+        self.assertEqual(credential_reason('chat.json',json.dumps(safe).encode()),CREDENTIAL_NOTE)
+        secret_metadata={'messages':[], 'source':{'github_token':'AbCdEf0123456789AbCdEf0123456789'}}
+        self.assertEqual(credential_reason('chat.json',json.dumps(secret_metadata).encode()),CREDENTIAL_NOTE)
+        auth=base64.b64encode(b'user:Ab12-secure-pass').decode()
+        nested={'messages':[], 'source':{'auths':{'registry.example':{'auth':auth}}}}
+        self.assertEqual(credential_reason('chat.json',json.dumps(nested).encode()),CREDENTIAL_NOTE)
+
     def test_common_credential_names_are_excluded(self):
         for name in (".env.production", "config/credentials.json", ".ssh/id_rsa", "backup/private.pem"):
             reason = credential_reason(name)

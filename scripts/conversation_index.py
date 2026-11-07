@@ -268,6 +268,10 @@ def _json_excerpts(text):
                        "message_id": message_id, "text": body, "date": str(message.get("date") or message.get("timestamp") or ""),
                        "line": 0, "line_start": 0, "line_end": 0, "position_kind": "message",
                        "message_index": index, "_source_kind": "original" if task or turn or message_id else "local"})
+        if isinstance(message.get('collection_order'), int) and message['collection_order'] >= 0:
+            result[-1]['collection_order'] = message['collection_order']
+        if isinstance(message.get('source_item_id'), str):
+            result[-1]['source_item_id'] = message['source_item_id']
     return result
 
 
@@ -322,7 +326,7 @@ def _source_identity(chapter_id, source, collision=False):
 
 def _entry_locator_match(entry, locator, known_entries=None):
     locator = str(locator or "")
-    id_match = False
+    precise_id_match = False
     for field, label in [('task_id',r'(?:任务|task)\s*ID'), ('turn_id',r'(?:轮次|turn)\s*(?:ID)?'), ('message_id',r'(?:消息|message)\s*ID')]:
         explicit = set(re.findall(label + r'\s*[:：]\s*([A-Za-z0-9_-]+)', locator, re.I))
         found = {item.get(field) for item in (known_entries or [entry]) if item.get(field) and re.search(rf"(?<![A-Za-z0-9_-]){re.escape(item[field])}(?![A-Za-z0-9_-])", locator)}
@@ -330,7 +334,8 @@ def _entry_locator_match(entry, locator, known_entries=None):
         if expected:
             if entry.get(field) not in expected:
                 return False
-            id_match = True
+            if field != 'task_id':
+                precise_id_match = True
     ranges = []
     for match in _LINE_RANGE_RE.finditer(locator):
         first = int(match.group(1)); last = int(match.group(2) or first)
@@ -343,7 +348,8 @@ def _entry_locator_match(entry, locator, known_entries=None):
         return any(first <= high and last >= low for low, high in ranges)
     message_numbers = [int(match.group(1)) for match in _MESSAGE_NUMBER_RE.finditer(locator)]
     if not message_numbers:
-        return id_match
+        # A task identifies a source, not which messages belong to a module.
+        return precise_id_match
     role = "用户" if re.search(r"(?:用户|user|human)\s*(?:第|message)", locator, re.I) else "助手" if re.search(r"(?:助手|assistant|chatgpt)\s*(?:第|message)", locator, re.I) else ""
     if not role:
         if re.search(r'(?i)(?:message\s*#|第\s*\d+\s*条消息)', locator):
@@ -417,6 +423,16 @@ def build_conversation_index(chapters, files):
                 if ordinal:
                     base = (*base, ordinal)
                 key = "conversation_" + _identity_sha("\x1f".join(map(str, base)))
+                # Older exports recorded provider item-N as message IDs. Reuse
+                # that saved entry only when the provider item and exact body
+                # agree; do not duplicate it or invent a new native message ID.
+                item_id = excerpt.get('source_item_id', '')
+                if not excerpt.get('message_id') and re.fullmatch(r'item-\d+', item_id):
+                    legacy = [e for e in entries.values() if e.get('message_id') == item_id
+                              and e.get('task_id') == excerpt.get('task_id') and e.get('turn_id') == excerpt.get('turn_id')
+                              and e.get('role') == excerpt.get('role') and _identity_normalise(e.get('text')) == _identity_normalise(excerpt.get('text'))]
+                    if len(legacy) == 1:
+                        key = legacy[0]['id']
                 if excerpt.get("turn_id"):
                     group_base = ("turn", 'task:' + excerpt['task_id'] if excerpt.get('task_id') else identity, excerpt.get("task_id", ""), excerpt.get("turn_id", ""))
                 else:
@@ -437,6 +453,8 @@ def build_conversation_index(chapters, files):
                     entries[key]["start_line"] = entries[key].get("line_start", entries[key].get("line", 1))
                     entries[key]["end_line"] = entries[key].get("line_end", entries[key].get("line", 1))
                     entries[key]["line_range"] = '' if excerpt.get('position_kind') == 'message' else f"L{entries[key].get('line_start', entries[key].get('line', 1))}-L{entries[key].get('line_end', entries[key].get('line', 1))}"
+                if 'collection_order' in excerpt:
+                    entries[key]['collection_order'] = excerpt['collection_order']
                 source["conversation_entry_ids"].append(key)
         for node in chapter["record"]["nodes"]:
             refs, available = [], []
@@ -456,7 +474,11 @@ def build_conversation_index(chapters, files):
         by_source_task[(entry.get("source_identity", ""), entry.get("task_id", ""))].append(entry)
         by_group[entry.get("turn_group_id", entry["id"])].append(entry)
     for group in by_group.values():
-        group.sort(key=lambda e: (e.get("message_index") or 0, e.get("line_start") or e.get("line") or 0, e["id"]))
+        collected = any('collection_order' in e for e in group)
+        group.sort(key=lambda e: (e.get('collection_order', float('inf')) if collected else e.get("message_index") or 0,
+                                  e.get("line_start") or e.get("line") or 0, e["id"]))
+        for index, entry in enumerate(group):
+            entry['conversation_order'] = index
         ids = [e["id"] for e in group]
         for entry in group:
             entry["turn_entry_ids"] = ids

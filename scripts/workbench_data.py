@@ -56,7 +56,12 @@ def audit_layout(layout):
     return {'nodes': len(nodes), 'edges': len(edges), 'crossings': 0, 'node_crossings': 0}
 
 
-def vertical_layout(viewer_bytes, record):
+def vertical_layout(viewer_bytes, record, prefer_branches=False):
+    if prefer_branches:
+        from branch_layout import branch_layout
+        branched = branch_layout(record)
+        if branched is not None:
+            return branched
     from compact_layout import compact_layout
     compact = compact_layout(record)
     if compact is not None:
