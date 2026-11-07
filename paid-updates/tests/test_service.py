@@ -27,7 +27,7 @@ import server  # noqa: E402
 
 CLIENT_CANDIDATES = [
     SERVICE_DIR.parent / "scripts" / "update_client.py",
-    SERVICE_DIR.parent / "editions" / "source" / "pro-base" / "scripts" / "update_client.py",
+    SERVICE_DIR.parent / "editions" / "source" / "chat-archify" / "scripts" / "update_client.py",
 ]
 CLIENT_SCRIPT = next((path for path in CLIENT_CANDIDATES if path.is_file()), CLIENT_CANDIDATES[0])
 CLIENT_SPEC = importlib.util.spec_from_file_location("service_smoke_update_client", CLIENT_SCRIPT)
@@ -73,17 +73,17 @@ class ServiceSmokeTests(unittest.TestCase):
 
     def _release_zip(self, version: str = "0.4.0") -> Path:
         source = Path(self.temp.name) / "source.zip"
-        file_path = "chat-archify-pro/README.txt"
+        file_path = "chat-archify/README.txt"
         file_bytes = b"offline Pro release\n"
         manifest = {
-            "name": "chat-archify-pro",
+            "name": "chat-archify",
             "version": version,
             "files": {"README.txt": hashlib.sha256(file_bytes).hexdigest()},
         }
         with zipfile.ZipFile(source, "w", compression=zipfile.ZIP_DEFLATED) as archive:
             archive.writestr(file_path, file_bytes)
             archive.writestr(
-                "chat-archify-pro/package-manifest.json",
+                "chat-archify/package-manifest.json",
                 json.dumps(manifest, separators=(",", ":")).encode("utf-8"),
             )
         return source
@@ -177,16 +177,16 @@ class ServiceSmokeTests(unittest.TestCase):
         mismatch = Path(self.temp.name) / "mismatch.zip"
         with zipfile.ZipFile(mismatch, "w") as archive:
             payload = b"file"
-            archive.writestr("chat-archify-pro/README.txt", payload)
+            archive.writestr("chat-archify/README.txt", payload)
             archive.writestr(
-                "chat-archify-pro/package-manifest.json",
+                "chat-archify/package-manifest.json",
                 json.dumps(
                     {
                         "name": "wrong-name",
                         "version": "0.4.0",
                         "files": [
                             {
-                                "path": "chat-archify-pro/README.txt",
+                                "path": "chat-archify/README.txt",
                                 "sha256": hashlib.sha256(payload).hexdigest(),
                                 "bytes": len(payload),
                             }
@@ -199,7 +199,7 @@ class ServiceSmokeTests(unittest.TestCase):
 
         unsafe = Path(self.temp.name) / "unsafe.zip"
         with zipfile.ZipFile(unsafe, "w") as archive:
-            archive.writestr("chat-archify-pro/../outside.txt", b"unsafe")
+            archive.writestr("chat-archify/../outside.txt", b"unsafe")
         with self.assertRaisesRegex(core.ReleaseError, "unsafe_archive_path"):
             self.store.register_release("0.4.1", unsafe)
 

@@ -1,4 +1,4 @@
-"""Local-first HTTP service for authorized Pro update delivery.
+"""Local-first HTTP service for authorized Chat Archify update delivery.
 
 Run this module through ``cli.py serve``.  The default listener is loopback;
 public deployment requires an explicitly enabled TLS reverse proxy.  There is
@@ -173,7 +173,7 @@ UPDATE_PAGE = r"""<!doctype html>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Pro 更新中心</title>
+  <title>Chat Archify 更新中心</title>
   <style>
     :root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
     body { margin: 0; background: #f7faff; color: #17324d; }
@@ -201,7 +201,7 @@ UPDATE_PAGE = r"""<!doctype html>
 <body>
 <main>
   <section class="card" aria-labelledby="title">
-    <h1 id="title">Pro 更新中心</h1>
+    <h1 id="title">Chat Archify 更新中心</h1>
     <p class="muted">输入授权文件中的许可证令牌。令牌只保存在当前页面内存中，不会写入 URL、localStorage 或 cookie。</p>
     <label for="license">许可证令牌</label>
     <input id="license" type="password" autocomplete="off" spellcheck="false" placeholder="Bearer token">
@@ -533,7 +533,7 @@ class UpdateRequestHandler(BaseHTTPRequestHandler):
             self.send_header("X-Content-Type-Options", "nosniff")
             self.send_header(
                 "Content-Disposition",
-                f'attachment; filename="pro-update-{release.version}.zip"',
+                f'attachment; filename="chat-archify-update-{release.version}.zip"',
             )
             self.end_headers()
             while True:

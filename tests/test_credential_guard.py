@@ -113,7 +113,7 @@ client = os.getenv("OPENAI_API_KEY")
 
 class ProPackagingCredentialTests(unittest.TestCase):
     def test_packaging_excludes_secrets_and_allows_safe_placeholder_document(self):
-        with tempfile.TemporaryDirectory(prefix="chat-archify-pro-credentials-") as directory:
+        with tempfile.TemporaryDirectory(prefix="chat-archify-credentials-") as directory:
             root = Path(directory)
             source = root / "source"
             shutil.copytree(EXAMPLE, source)
@@ -158,7 +158,7 @@ class ProPackagingCredentialTests(unittest.TestCase):
             self.assertEqual(base64.b64decode(safe["data"], validate=True), safe_bytes)
 
     def test_snapshot_reuse_rechecks_preserved_bytes(self):
-        with tempfile.TemporaryDirectory(prefix="chat-archify-pro-snapshot-credentials-") as directory:
+        with tempfile.TemporaryDirectory(prefix="chat-archify-snapshot-credentials-") as directory:
             root = Path(directory)
             source = root / "source"
             shutil.copytree(EXAMPLE, source)

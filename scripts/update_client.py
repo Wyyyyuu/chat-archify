@@ -1,14 +1,14 @@
-"""Manual Pro update checker/downloader with only Python's standard library.
+"""Manual Chat Archify update checker/downloader with only Python's standard library.
 
 The client checks and downloads an archive after an explicit command.  It does
 not install, extract, import, or execute downloaded code.
 
 Usage::
 
-    python editions/source/pro-base/scripts/update_client.py --service http://127.0.0.1:8787 \
+    python editions/source/chat-archify/scripts/update_client.py --service http://127.0.0.1:8787 \
         --license-file operator/license.json check
     python scripts/update_client.py --service https://updates.example \
-        --license-file operator/license.json download --dest pro-update.zip
+        --license-file operator/license.json download --dest chat-archify-update.zip
 """
 from __future__ import annotations
 
@@ -39,7 +39,7 @@ SEMVER_RE = re.compile(
 )
 MAX_JSON_BYTES = 1024 * 1024
 CHUNK_BYTES = 1024 * 1024
-PACKAGE_NAME = "chat-archify-pro"
+PACKAGE_NAME = "chat-archify"
 PACKAGE_MANIFEST_PATH = PACKAGE_NAME + "/package-manifest.json"
 
 
@@ -358,7 +358,7 @@ class UpdateClient:
 
 
 def _parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Manual Pro update check/download client")
+    parser = argparse.ArgumentParser(description="Manual Chat Archify update check/download client")
     parser.add_argument("--service", required=True, help="HTTPS service URL or localhost HTTP URL")
     parser.add_argument("--license-file", required=True, help="local JSON license file")
     parser.add_argument("--timeout", type=float, default=20.0)

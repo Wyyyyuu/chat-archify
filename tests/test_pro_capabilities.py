@@ -18,7 +18,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--source-dir', type=Path, required=True)
     args = parser.parse_args()
-    with tempfile.TemporaryDirectory(prefix='chat-archify-pro-') as temp:
+    with tempfile.TemporaryDirectory(prefix='chat-archify-') as temp:
         work = Path(temp)
         shutil.copytree(args.source_dir, work / 'source')
         source = work / 'source'

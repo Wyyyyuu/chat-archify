@@ -1,8 +1,8 @@
 # Chat Archify maintenance / 维护
 
-This public repository contains the full skill at its root. The historical `-pro` repository/package ID remains for compatibility; there is no current Lite/Pro feature split. Public releases require no purchase or license key.
+This public repository contains the full skill at its root. Repository, package, installation folder and invocation ID use `chat-archify`; there is one full version. Public releases require no purchase or license key.
 
-本公开仓库根目录为完整 Skill。`-pro` 仅是兼容旧安装的技术名称，当前不区分 Lite / Pro，不要求购买或授权码。README 配图使用虚构资料；界面导览是标注过的示意图，另附基础渲染器的真实 SVG 导出。
+本公开仓库根目录为完整 Skill。仓库、安装包、安装目录与调用名均为 `chat-archify`，不要求购买或授权码。README 配图使用虚构资料；界面导览是标注过的示意图，另附基础渲染器的真实 SVG 导出。
 
 The release ZIP contains the skill. `paid-updates/` is retained legacy service code, not a required dependency or an active commercial offer. It is not deployed by uploading this repository; no checkout is connected. Service databases, credentials, real chats, and real project artifacts are excluded.
 

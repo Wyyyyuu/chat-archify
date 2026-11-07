@@ -24,10 +24,10 @@ RELEASE_ID = "rel_" + "a" * 12
 
 
 def _package_bytes():
-    file_path = "chat-archify-pro/README.txt"
+    file_path = "chat-archify/README.txt"
     file_bytes = b"offline Pro release\n"
     manifest = {
-        "name": "chat-archify-pro",
+        "name": "chat-archify",
         "version": "0.4.0",
         "files": {"README.txt": hashlib.sha256(file_bytes).hexdigest()},
     }
@@ -35,7 +35,7 @@ def _package_bytes():
     with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         archive.writestr(file_path, file_bytes)
         archive.writestr(
-            "chat-archify-pro/package-manifest.json",
+            "chat-archify/package-manifest.json",
             json.dumps(manifest, separators=(",", ":")).encode("utf-8"),
         )
     return output.getvalue()

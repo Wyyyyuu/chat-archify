@@ -28,7 +28,7 @@ python scripts/apply_update_review.py "before.html" "candidate.html" "decision.j
 
 ## 获取新 Skill 版本
 
-当前只有一个完整公开版本，从 [GitHub Releases](https://github.com/Wyyyyuu/chat-archify-pro/releases) 下载。使用与公开版本下载不需要付款、授权码或更新服务。仓库、包名与调用名保留 `chat-archify-pro`，仅用于兼容旧安装，不表示功能分层。阅读版本说明，备份旧 Skill 后由用户决定替换；不自动安装或运行。
+当前只有一个完整公开版本，从 [GitHub Releases](https://github.com/Wyyyyuu/chat-archify/releases) 下载。使用与公开版本下载不需要付款、授权码或更新服务。仓库、包名、安装目录与调用名统一为 `chat-archify`。升级旧命名安装时备份旧目录并移出启用的 skills 路径，避免重复加载；历史 HTML 和记录继续可读。阅读版本说明，备份旧 Skill 后由用户决定替换；不自动安装或运行。
 
 ### 历史授权服务（兼容入口）
 
@@ -38,7 +38,7 @@ python scripts/apply_update_review.py "before.html" "candidate.html" "decision.j
 
 ```sh
 python scripts/update_client.py --service "https://updates.example" --license-file "license.json" check
-python scripts/update_client.py --service "https://updates.example" --license-file "license.json" download --dest "chat-archify-pro-update.zip"
+python scripts/update_client.py --service "https://updates.example" --license-file "license.json" download --dest "chat-archify-update.zip"
 ```
 
 示例地址需要替换为发行者实际提供的服务。授权期可以设为固定天数或永久；开发示例默认 365 天，不代表已经确定产品的更新政策。授权控制新版本下载，不撤销已下载 Skill 和 HTML 的离线使用。

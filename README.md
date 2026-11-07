@@ -8,7 +8,7 @@ Turn scattered conversations into a clickable map of **what changed, why it chan
 
 **English** · [简体中文](README.zh-CN.md)
 
-[Download the skill](https://github.com/Wyyyyuu/chat-archify-pro/releases/tag/v0.7.0) · [Try the HTML demo](https://github.com/Wyyyyuu/chat-archify-pro/releases/download/v0.7.0/chat-archify-demo.html) · [How it works](#from-conversation-to-context)
+[Download the skill](https://github.com/Wyyyyuu/chat-archify/releases/tag/v0.7.1) · [Try the HTML demo](https://github.com/Wyyyyuu/chat-archify/releases/download/v0.7.1/chat-archify-demo.html) · [How it works](#from-conversation-to-context)
 
 **One full version · Offline HTML · Use only when you ask**
 
@@ -55,7 +55,7 @@ Chat Archify is a skill for answering those questions. It turns the available co
 
 ## Try it in two minutes
 
-1. [Download the fictional demo](https://github.com/Wyyyyuu/chat-archify-pro/releases/download/v0.7.0/chat-archify-demo.html) and open it in a modern desktop browser. GitHub provides a file download, not a running HTML app.
+1. [Download the fictional demo](https://github.com/Wyyyyuu/chat-archify/releases/download/v0.7.1/chat-archify-demo.html) and open it in a modern desktop browser. GitHub provides a file download, not a running HTML app.
 2. Click a stage, then **合并为弹性阅读计划**. Explore its explanation and linked files.
 3. Open **打开对话索引** to read the saved messages. Try **续聊包** to prepare a handoff.
 
@@ -63,16 +63,16 @@ The example contains six synthetic messages, five nodes, and four Markdown resou
 
 ## Install and use
 
-Download `chat-archify-pro.zip` from the [v0.7.0 release](https://github.com/Wyyyyuu/chat-archify-pro/releases/tag/v0.7.0). Extract the `chat-archify-pro` folder into your host's skills directory. In Codex, that is normally `~/.codex/skills/`; restart or reload skills if needed.
+Download `chat-archify.zip` from the [v0.7.1 release](https://github.com/Wyyyyuu/chat-archify/releases/tag/v0.7.1). Extract the `chat-archify` folder into your host's skills directory. In Codex, that is normally `~/.codex/skills/`; restart or reload skills if needed.
 
-The repository, archive, and invocation ID retain the historical `-pro` suffix for compatibility. **There is now one full public version: no Lite/Pro feature split, purchase, or license key is required to use it.** Back up and replace an existing copy rather than installing two copies of the same skill.
+**The repository, archive, installation folder, and skill invocation now all use `chat-archify`.** There is one full public version, with no feature tiers, purchase, or license key required. When upgrading from a formerly named edition, back up and remove its old folder from the active skills directory, then install `chat-archify` and use `$chat-archify`. Keep your generated HTML and project records; they do not need to be recreated.
 
 Generation requires **Python 3.9+**, **Node.js 18+**, and a separately installed [Archify](https://github.com/tt-a1i/archify) runtime. The integration was tested with Archify `2.17.0-dev.1`. The generated HTML needs only a browser with JavaScript enabled. Your AI host supplies the model; this repository does not include an LLM API or credits.
 
 Then ask your AI:
 
 ```text
-Use $chat-archify-pro to organize this project's available conversations.
+Use $chat-archify to organize this project's available conversations.
 Show the main stages, key decisions, failed approaches, and unfinished work.
 Attach relevant files with a short explanation of their purpose.
 Generate a local interactive HTML and report gaps in the source coverage.
@@ -81,7 +81,7 @@ Generate a local interactive HTML and report gaps in the source coverage.
 No code repository? Try:
 
 ```text
-Use $chat-archify-pro to map this long conversation.
+Use $chat-archify to map this long conversation.
 Show topics, alternatives, decisions, and open questions.
 There are no project files; leave resources empty where none exist.
 ```
@@ -122,6 +122,6 @@ Output stays local unless you share it. **Sharing the HTML also shares embedded 
 
 ## Help shape Chat Archify
 
-Try it on a messy discussion or a project you have not touched for a while. [Open an issue](https://github.com/Wyyyyuu/chat-archify-pro/issues) with the confusing step, expected behavior, and a small synthetic example. Avoid uploading private conversations or credentials.
+Try it on a messy discussion or a project you have not touched for a while. [Open an issue](https://github.com/Wyyyyuu/chat-archify/issues) with the confusing step, expected behavior, and a small synthetic example. Avoid uploading private conversations or credentials.
 
 If it helps you return to a project with confidence, a star helps other AI builders find it.

@@ -4,7 +4,7 @@
 
 ## 依赖与一键虚构示例
 
-完整生成依赖 Python 3.9 或更新版本、Node.js 18 或更新版本，以及单独安装的 Archify skill。Archify 不随 Chat Archify Pro 打包，也不由示例脚本安装。当前集成只在 Archify 2.17.0-dev.1 上验证；其他版本需重新核验工作流 schema、节点联动和生成结果。上游：[github.com/tt-a1i/archify](https://github.com/tt-a1i/archify)。
+完整生成依赖 Python 3.9 或更新版本、Node.js 18 或更新版本，以及单独安装的 Archify skill。Archify 不随 Chat Archify 打包，也不由示例脚本安装。当前集成只在 Archify 2.17.0-dev.1 上验证；其他版本需重新核验工作流 schema、节点联动和生成结果。上游：[github.com/tt-a1i/archify](https://github.com/tt-a1i/archify)。
 
 在宿主的已安装技能列表或配置的 skills 目录中找到 archify/SKILL.md，阅读它的调用要求；把其所在目录（内含 bin/archify.mjs）作为 --archify-dir。目录含空格时也用引号。无需预先填写示例 JSON 或画图，在 skill 根目录运行：
 

@@ -8,7 +8,7 @@
 
 [English](README.md) · **简体中文**
 
-[下载完整 Skill](https://github.com/Wyyyyuu/chat-archify-pro/releases/tag/v0.7.0) · [体验 HTML 示例](https://github.com/Wyyyyuu/chat-archify-pro/releases/download/v0.7.0/chat-archify-demo.html) · [了解使用效果](#从聊天记录到项目脉络)
+[下载完整 Skill](https://github.com/Wyyyyuu/chat-archify/releases/tag/v0.7.1) · [体验 HTML 示例](https://github.com/Wyyyyuu/chat-archify/releases/download/v0.7.1/chat-archify-demo.html) · [了解使用效果](#从聊天记录到项目脉络)
 
 **完整版本公开 · HTML 离线阅读 · 仅在你要求时运行**
 
@@ -55,7 +55,7 @@ Chat Archify 就是为这些时刻准备的 Skill。它把可读取的对话和�
 
 ## 两分钟体验
 
-1. [下载虚构示例 HTML](https://github.com/Wyyyyuu/chat-archify-pro/releases/download/v0.7.0/chat-archify-demo.html)，用现代桌面浏览器打开。GitHub 提供文件下载，不会直接运行 HTML。
+1. [下载虚构示例 HTML](https://github.com/Wyyyyuu/chat-archify/releases/download/v0.7.1/chat-archify-demo.html)，用现代桌面浏览器打开。GitHub 提供文件下载，不会直接运行 HTML。
 2. 点击阶段，再选择 **合并为弹性阅读计划**，查看说明和关联文件。
 3. 点击 **打开对话索引** 阅读消息，再试试 **续聊包**，准备一份交接资料。
 
@@ -63,16 +63,16 @@ Chat Archify 就是为这些时刻准备的 Skill。它把可读取的对话和�
 
 ## 安装与使用
 
-从 [v0.7.0 发布页](https://github.com/Wyyyyuu/chat-archify-pro/releases/tag/v0.7.0) 下载 `chat-archify-pro.zip`，将其中的 `chat-archify-pro` 文件夹解压到宿主的 skills 目录。Codex 通常使用 `~/.codex/skills/`；必要时重启或重新加载 Skill。
+从 [v0.7.1 发布页](https://github.com/Wyyyyuu/chat-archify/releases/tag/v0.7.1) 下载 `chat-archify.zip`，将其中的 `chat-archify` 文件夹解压到宿主的 skills 目录。Codex 通常使用 `~/.codex/skills/`；必要时重启或重新加载 Skill。
 
-为兼容已有安装，仓库地址、压缩包和调用名暂时保留历史上的 `-pro` 后缀。**现在只有一个完整公开版本，不再区分 Lite / Pro 功能，使用不需要购买或授权码。** 已安装旧版时，先备份再替换，避免同一个 Skill 装两份。
+**仓库、压缩包、安装目录和 Skill 调用名现已统一为 `chat-archify`。** 只有一个完整公开版本，不区分功能档位，不需要购买或授权码。从旧命名版本升级时，先备份并将旧文件夹移出启用的 skills 目录，再安装 `chat-archify`，使用 `$chat-archify` 调用。已生成的 HTML 和项目记录继续保留，无需重新整理。
 
 生成完整页面需要 **Python 3.9+**、**Node.js 18+**，以及另行安装的 [Archify](https://github.com/tt-a1i/archify) 运行时；当前集成测试使用 `2.17.0-dev.1`。生成后的 HTML 只需启用 JavaScript 的浏览器即可阅读。AI 模型由宿主提供，本仓库不包含模型 API 或额度。
 
 安装后，可以直接这样说：
 
 ```text
-使用 $chat-archify-pro 梳理这个项目能读取的相关对话。
+使用 $chat-archify 梳理这个项目能读取的相关对话。
 展示主要阶段、关键决策、失败转向和未完成事项，
 为相关文件写一句用途说明，生成本地交互 HTML。
 同时告诉我来源覆盖范围，以及仍然缺少哪些内容。
@@ -81,7 +81,7 @@ Chat Archify 就是为这些时刻准备的 Skill。它把可读取的对话和�
 普通长对话也可以：
 
 ```text
-使用 $chat-archify-pro 整理这段长对话。
+使用 $chat-archify 整理这段长对话。
 按话题、备选方案、决定和待确认问题生成脉络图。
 没有项目文件，缺少资源的地方留空即可。
 ```
@@ -121,6 +121,6 @@ python scripts/build_plain_demo.py --archify-dir "/path/to/archify" --out-dir "p
 
 ## 一起把它做得更好
 
-可以拿一段复杂讨论，或者一个搁置了一阵的项目试试。如果某一步难理解，欢迎[提交 Issue](https://github.com/Wyyyyuu/chat-archify-pro/issues)，说明实际表现、预期效果，并尽量提供小型虚构示例，不上传私人对话或凭据。
+可以拿一段复杂讨论，或者一个搁置了一阵的项目试试。如果某一步难理解，欢迎[提交 Issue](https://github.com/Wyyyyuu/chat-archify/issues)，说明实际表现、预期效果，并尽量提供小型虚构示例，不上传私人对话或凭据。
 
 如果它帮你接上了之前的工作，欢迎点一颗 Star，让更多用 AI 做项目的人发现它。

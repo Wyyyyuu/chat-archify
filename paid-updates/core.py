@@ -28,7 +28,7 @@ from typing import IO, Any, Dict, Iterable, Optional, Tuple
 
 
 PRODUCT = "pro"
-PACKAGE_NAME = "chat-archify-pro"
+PACKAGE_NAME = "chat-archify"
 PACKAGE_MANIFEST_PATH = f"{PACKAGE_NAME}/package-manifest.json"
 DEFAULT_LICENSE_DAYS = 365
 MAX_NOTES_BYTES = 64 * 1024

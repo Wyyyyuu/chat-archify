@@ -1,8 +1,8 @@
 > **Legacy / 历史兼容代码：** Chat Archify is now fully public; no purchase, license key or this service is needed for usage or public updates. 当前完整版本已公开，此服务不是使用依赖，也未启用收费。
 
-# Pro paid-updates service
+# Chat Archify legacy update service
 
-This is a small, standard-library-only update service for the Pro skill. It
+This is a small, standard-library-only update service for the Chat Archify skill. It
 supports manual, one-time license issuance and authorized ZIP delivery. It
 does **not** implement checkout, subscriptions, Stripe, webhooks, email, or
 automatic installation. Existing offline HTML and skill files remain usable
@@ -10,10 +10,10 @@ forever without this service.
 
 ## Quick start
 
-Run commands from the private Pro repository root. In the combined maintenance
+Run commands from the Chat Archify repository root. In the combined maintenance
 workspace, replace `scripts/update_client.py` with
-`editions/source/pro-base/scripts/update_client.py`, and `tests/test_update_client.py`
-with `editions/source/pro-base/tests/test_update_client.py`.
+`editions/source/chat-archify/scripts/update_client.py`, and `tests/test_update_client.py`
+with `editions/source/chat-archify/tests/test_update_client.py`.
 The directory name is intentionally
 `paid-updates`; it is a collection of executable scripts, not a Python package.
 
@@ -24,7 +24,7 @@ python paid-updates/cli.py --db paid-updates/data/paid-updates.sqlite3 \
 
 python paid-updates/cli.py --db paid-updates/data/paid-updates.sqlite3 \
   --release-dir paid-updates/releases release-add \
-  --version 0.4.0 --zip path/to/chat-archify-pro.zip \
+  --version 0.4.0 --zip path/to/chat-archify.zip \
   --notes-file path/to/notes.txt
 
 python paid-updates/cli.py --db paid-updates/data/paid-updates.sqlite3 \
@@ -34,7 +34,7 @@ python scripts/update_client.py --service http://127.0.0.1:8787 \
   --license-file paid-updates/data/operator.license.json check
 python scripts/update_client.py --service http://127.0.0.1:8787 \
   --license-file paid-updates/data/operator.license.json download \
-  --dest paid-updates/data/chat-archify-pro-update.zip
+  --dest paid-updates/data/chat-archify-update.zip
 ```
 
 `issue` defaults to 365 days. Use `--days N` for another fixed duration or
@@ -51,7 +51,7 @@ python paid-updates/cli.py --db paid-updates/data/paid-updates.sqlite3 \
 
 The first release registration computes the actual SHA-256 and byte count.
 Before copying a ZIP, it validates the archive without extracting it. Every
-release must contain `chat-archify-pro/package-manifest.json` with matching
+release must contain `chat-archify/package-manifest.json` with matching
 `name`, CLI `--version`, and a complete `files` list. Each listed file must
 have its actual `sha256` and `bytes`; unsafe paths, duplicate entries,
 encrypted members, symlinks, missing files, and extra unlisted files are
@@ -60,7 +60,7 @@ minimal manifest shape is:
 
 ```json
 {
-  "name": "chat-archify-pro",
+  "name": "chat-archify",
   "version": "0.4.0",
   "files": {
     "SKILL.md": "64-lowercase-hex-sha256",
@@ -69,7 +69,7 @@ minimal manifest shape is:
 }
 ```
 
-The map paths are relative to `chat-archify-pro/`; the validator maps them to
+The map paths are relative to `chat-archify/`; the validator maps them to
 the ZIP members, reads actual bytes while hashing, and requires the complete
 regular-member set exactly once. The richer list form with `path`, `sha256`,
 and `bytes` is also accepted. The package manifest itself is excluded from
@@ -108,7 +108,7 @@ origin.
 
 ## Files and secrets
 
-Keep the SQLite file, release directory, and license JSON outside the Pro
+Keep the SQLite file, release directory, and license JSON outside the Chat Archify
 skill or public HTML. The generated license JSON is a bearer credential: back
 it up securely, protect its parent directory with the current Windows user
 ACL (POSIX mode `0600` is applied where supported), and do not paste it into
@@ -139,10 +139,10 @@ credentials are needed to run this service today.
 
 ## Local validation / 本地验证
 
-From the private Pro repository root, run:
+From the Chat Archify repository root, run:
 
-在私有 Pro 仓库根目录运行；在合并维护目录中，将客户端测试路径改为
-`editions/source/pro-base/tests/test_update_client.py`：
+在Chat Archify 仓库根目录运行；在合并维护目录中，将客户端测试路径改为
+`editions/source/chat-archify/tests/test_update_client.py`：
 
 ```sh
 python -m unittest -v paid-updates/tests/test_service.py tests/test_update_client.py
@@ -157,7 +157,7 @@ origin restrictions and redirect rejection; they do not deploy or connect checko
 
 ## 简体中文说明
 
-这是一个仅使用 Python 标准库的 Pro 更新服务：支持管理员手动签发/撤销
+这是一个仅使用 Python 标准库的 Chat Archify 历史更新服务：支持管理员手动签发/撤销
 Bearer 授权，以及按登记版本下载受权 ZIP。本轮不接入 checkout、订阅、
 Stripe、webhook、邮件或自动安装；已有离线 HTML 与 skill 永久可用。
 
@@ -171,5 +171,5 @@ Stripe、webhook、邮件或自动安装；已有离线 HTML 与 skill 永久可
 不创建后台任务、不发邮件。
 
 客户端必须显式执行 `check` 或 `download`。下载先校验 SHA-256 与 bytes，
-再校验包内 `chat-archify-pro/package-manifest.json` 的版本与文件 hash/bytes；
+再校验包内 `chat-archify/package-manifest.json` 的版本与文件 hash/bytes；
 不会自动解压、安装、导入或执行。

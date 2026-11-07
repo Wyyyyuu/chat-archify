@@ -34,7 +34,7 @@ def _store(args: argparse.Namespace) -> Store:
 
 
 def _build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Local Pro update license/release service")
+    parser = argparse.ArgumentParser(description="Local Chat Archify update license/release service")
     parser.add_argument("--db", default=_default_db(), help="SQLite path (default: env or data/paid-updates.sqlite3)")
     parser.add_argument("--release-dir", default=_default_release_dir(), help="server-owned ZIP directory")
     sub = parser.add_subparsers(dest="command", required=True)

@@ -1,6 +1,6 @@
 'use strict';
 /*
- * Chat Archify Pro tools.  This file is intentionally data-only: selected old
+ * Chat Archify tools.  This file is intentionally data-only: selected old
  * HTML is parsed as inert explorer-data JSON, fields are rendered with
  * textContent, and no source message or file body is executed or copied into a
  * continuation packet.
