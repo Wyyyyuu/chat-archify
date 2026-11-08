@@ -6,7 +6,7 @@
 
 Turn scattered conversations into a clickable map of **what changed, why it changed, and where the work lives.**
 
-**English** · [简体中文](README.zh-CN.md)
+**English** · [Simplified Chinese](README.zh-CN.md)
 
 [Download the skill](https://github.com/Wyyyyuu/chat-archify/releases/tag/v0.7.1) · [Try the HTML demo](https://github.com/Wyyyyuu/chat-archify/releases/download/v0.7.1/chat-archify-demo.html) · [How it works](#from-conversation-to-context)
 
@@ -42,7 +42,7 @@ Chat Archify is a skill for answering those questions. It turns the available co
 
 ![English diagram of the fictional reading-plan record](assets/showcase/example-flow-en.png)
 
-*English translation of the basic-renderer export: one goal, two candidate approaches, a combined plan, and a future review. The full HTML adds the workspace, file reader, conversation index, and handoff tools. “Proposed” is deliberately not presented as “verified.”*
+*Static English illustration adapted from the basic-renderer export: one goal, two candidate approaches, a combined plan, and a future review. Download the HTML demo for clickable nodes, the workspace, file reader, conversation index, and handoff tools. “Proposed” is deliberately not presented as “verified.”*
 
 ### More than a diagram
 
@@ -55,11 +55,13 @@ Chat Archify is a skill for answering those questions. It turns the available co
 
 ## Try it in two minutes
 
-1. [Download the fictional demo](https://github.com/Wyyyyuu/chat-archify/releases/download/v0.7.1/chat-archify-demo.html) and open it in a modern desktop browser. GitHub provides a file download, not a running HTML app.
-2. Click a stage, then **合并为弹性阅读计划**. Explore its explanation and linked files.
-3. Open **打开对话索引** to read the saved messages. Try **续聊包** to prepare a handoff.
+The downloadable viewer and demo content currently use Chinese. The English illustrations above explain the same layout.
 
-The example contains six synthetic messages, five nodes, and four Markdown resources. It contains no real user chat. The current viewer and example labels are primarily Chinese; this documentation is bilingual.
+1. [Download the fictional demo](https://github.com/Wyyyyuu/chat-archify/releases/download/v0.7.1/chat-archify-demo.html) and open it in a modern desktop browser. GitHub provides a file download, not a running HTML app.
+2. Select a stage in the left panel, then select the decision node where the two candidate paths merge. Explore its explanation and linked files in the right panel.
+3. Use the conversation-index button in the right panel to read the saved messages. To prepare a handoff, use the export button next to search in the top bar.
+
+The example contains six synthetic messages, five nodes, and four Markdown resources. It contains no real user chat.
 
 ## Install and use
 
@@ -110,7 +112,7 @@ Open `demo-output/chat-archify-demo.html`. The command builds the example and ru
 python scripts/build_plain_demo.py --archify-dir "/path/to/archify" --out-dir "plain-demo"
 ```
 
-Details: [skill workflow](SKILL.md) · [record format](references/graph-format.md) · [collection](references/automatic-collection.md) · [summary reuse](references/incremental-summaries.md) · [continuation and reviews](references/continuation-and-updates.md).
+Detailed references (currently in Chinese): [skill workflow](SKILL.md) · [record format](references/graph-format.md) · [collection](references/automatic-collection.md) · [summary reuse](references/incremental-summaries.md) · [continuation and reviews](references/continuation-and-updates.md).
 
 ## What to expect
 
