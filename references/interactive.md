@@ -16,6 +16,20 @@ python scripts/build_interactive_demo.py --archify-dir "<archify-skill-directory
 
 此 smoke test 使用小型 fake DOM，只验证代码层面的导航行为，不能作为真实浏览器或视觉验收。若宿主允许使用 Archify 自带浏览器采集，可对成功 deliver 的确切 HTML 运行 node "<archify-skill-directory>/bin/archify.mjs" visual-check "<output-html>" --json；将该证据与人工视觉检查分别报告。不要通过另一个浏览器、CDP 或本地 HTTP 服务绕过宿主的本地文件限制。
 
+## 界面语言
+
+完整 HTML 顶栏提供中文／English 选择，覆盖图表控件、状态、文件阅读、对话索引、续聊包和增量审查。切换保留当前节点、文件、展开状态、对话框、筛选与滚动位置；在允许本地存储时记住该页面的选择。优先级为深链 `#lang=en`（可与 chapter/node 等参数并存）、该文件的已存选择、manifest.locale；旧 manifest 未填写时默认 `zh-CN`。界面语言也会写入后续导航链接。
+
+manifest 增加 `"locale": "en"` 即可默认英文，也可用 `package_interactive.py ... --language en` 覆盖。切换仅改变界面文案和导出续聊包的栏目标题，不自动翻译项目标题、节点摘要、证据、原始对话、文件名或正文。源内容的身份、原文和快照字节不因此变化；需要英文内容时，作者应为节点说明选择英文，原始证据保持原文。
+
+生成全英文虚构示例：
+
+~~~sh
+python scripts/build_interactive_demo.py --archify-dir "<archify-skill-directory>" --out-dir "demo-en" --language en
+~~~
+
+入口为 `demo-en/chat-archify-demo-en.html`，使用随包的英文合成对话与资源；默认中文示例仍为 `chat-archify-demo.html`。英文 README 链接英文入口，中文 README 链接中文入口。两个入口均可切换界面语言。新增界面文案应使用 `assets/locales/en.json` 的同一消息键及现有翻译函数；不对整份 DOM 或用户正文做全局替换。验收包含 `tests/i18n.cjs` 和两种示例的 `tests/interactive-navigation.cjs`；进程内检查不等同于真实浏览器验收。
+
 ## 为真实对话准备来源
 
 1. 明确时间、任务／话题范围以及可读取材料。使用 coverage 说明完整记录、选定摘录、摘要或不可访问部分。普通对话可以直接用 project.title 作为话题，不用虚构项目模块。

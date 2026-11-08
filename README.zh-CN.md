@@ -8,7 +8,7 @@
 
 [English](README.md) · **简体中文**
 
-[下载完整 Skill](https://github.com/Wyyyyuu/chat-archify/releases/tag/v0.7.1) · [体验 HTML 示例](https://github.com/Wyyyyuu/chat-archify/releases/download/v0.7.1/chat-archify-demo.html) · [了解使用效果](#从聊天记录到项目脉络)
+[下载完整 Skill](https://github.com/Wyyyyuu/chat-archify/releases/tag/v0.8.0) · [体验 HTML 示例](https://github.com/Wyyyyuu/chat-archify/releases/download/v0.8.0/chat-archify-demo.html) · [了解使用效果](#从聊天记录到项目脉络)
 
 **完整版本公开 · HTML 离线阅读 · 仅在你要求时运行**
 
@@ -46,6 +46,7 @@ Chat Archify 就是为这些时刻准备的 Skill。它把可读取的对话和�
 
 ### 图只是入口，资料也能顺着找到
 
+- **界面中英可切换：** 当前节点、文件、展开状态和对话阅读位置保持不变。
 - **文件有说明：** 用简短用途和功能分组解释产物，默认不堆满逐文件代码差异。
 - **对话可追溯：** 索引标题优先显示本轮问题，支持页内问答阅读、搜索，以及对话与模块的手动关联。
 - **来源有覆盖记录：** 宿主支持时，采集可读的活动／归档 Codex 对话，处理分页和断点恢复；其他平台可使用用户提供的导出。
@@ -55,15 +56,15 @@ Chat Archify 就是为这些时刻准备的 Skill。它把可读取的对话和�
 
 ## 两分钟体验
 
-1. [下载虚构示例 HTML](https://github.com/Wyyyyuu/chat-archify/releases/download/v0.7.1/chat-archify-demo.html)，用现代桌面浏览器打开。GitHub 提供文件下载，不会直接运行 HTML。
+1. [下载虚构示例 HTML](https://github.com/Wyyyyuu/chat-archify/releases/download/v0.8.0/chat-archify-demo.html)，用现代桌面浏览器打开。GitHub 提供文件下载，不会直接运行 HTML。
 2. 点击阶段，再选择 **合并为弹性阅读计划**，查看说明和关联文件。
 3. 点击 **打开对话索引** 阅读消息，再试试 **续聊包**，准备一份交接资料。
 
-示例包含六条合成消息、五个节点、四份 Markdown 资源，不含真实用户对话。当前查看器和示例主要使用中文，项目说明提供中英文。
+示例包含六条合成消息、五个节点、四份 Markdown 资源，不含真实用户对话。此入口默认中文；顶栏可切换中文／English，并保留阅读位置。原始对话与文件正文保持原语言。[英文示例](https://github.com/Wyyyyuu/chat-archify/releases/download/v0.8.0/chat-archify-demo-en.html) 使用英文合成内容，默认英文界面。
 
 ## 安装与使用
 
-从 [v0.7.1 发布页](https://github.com/Wyyyyuu/chat-archify/releases/tag/v0.7.1) 下载 `chat-archify.zip`，将其中的 `chat-archify` 文件夹解压到宿主的 skills 目录。Codex 通常使用 `~/.codex/skills/`；必要时重启或重新加载 Skill。
+从 [v0.8.0 发布页](https://github.com/Wyyyyuu/chat-archify/releases/tag/v0.8.0) 下载 `chat-archify.zip`，将其中的 `chat-archify` 文件夹解压到宿主的 skills 目录。Codex 通常使用 `~/.codex/skills/`；必要时重启或重新加载 Skill。
 
 **仓库、压缩包、安装目录和 Skill 调用名现已统一为 `chat-archify`。** 只有一个完整公开版本，不区分功能档位，不需要购买或授权码。从旧命名版本升级时，先备份并将旧文件夹移出启用的 skills 目录，再安装 `chat-archify`，使用 `$chat-archify` 调用。已生成的 HTML 和项目记录继续保留，无需重新整理。
 
@@ -103,7 +104,7 @@ Skill 仅在明确要求时运行，不在后台监控你的聊天。
 python scripts/build_interactive_demo.py --archify-dir "/path/to/archify" --out-dir "demo-output"
 ```
 
-打开 `demo-output/chat-archify-demo.html`。这条命令会生成示例，并执行随包程序检查。没有项目文件的普通长对话示例：
+打开 `demo-output/chat-archify-demo.html`。这条命令会生成示例，并执行随包程序检查。加上 `--language en` 可生成默认英文的 `chat-archify-demo-en.html`，其中的虚构对话与附件也使用英文。没有项目文件的普通长对话示例：
 
 ```sh
 python scripts/build_plain_demo.py --archify-dir "/path/to/archify" --out-dir "plain-demo"

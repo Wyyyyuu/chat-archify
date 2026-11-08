@@ -1,0 +1,127 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Fictional Reading Plan Discussion",
+    "locale": "en",
+    "quality_profile": "showcase"
+  },
+  "lanes": [
+    {
+      "id": "reader",
+      "label": "Reader"
+    },
+    {
+      "id": "options",
+      "label": "Options"
+    },
+    {
+      "id": "weekend-option",
+      "label": "Weekend option"
+    },
+    {
+      "id": "follow-up",
+      "label": "Follow-up"
+    }
+  ],
+  "mainPath": [
+    "question",
+    "daily-option",
+    "combined-plan",
+    "review-later"
+  ],
+  "nodes": [
+    {
+      "id": "question",
+      "lane": "reader",
+      "col": 0,
+      "type": "frontend",
+      "label": "Reading habit",
+      "sublabel": "Set the goal"
+    },
+    {
+      "id": "daily-option",
+      "lane": "options",
+      "col": 1,
+      "type": "backend",
+      "label": "Daily sessions",
+      "sublabel": "Ten minutes daily"
+    },
+    {
+      "id": "weekend-option",
+      "lane": "weekend-option",
+      "col": 1,
+      "type": "backend",
+      "label": "Weekends",
+      "sublabel": "Keep an alternative"
+    },
+    {
+      "id": "combined-plan",
+      "lane": "options",
+      "col": 3,
+      "type": "security",
+      "label": "Flexible plan",
+      "sublabel": "Daily + catch-up",
+      "tag": "Agreed",
+      "width": 160
+    },
+    {
+      "id": "review-later",
+      "lane": "options",
+      "col": 4,
+      "type": "external",
+      "label": "Review later",
+      "sublabel": "Results unknown"
+    }
+  ],
+  "edges": [
+    {
+      "from": "question",
+      "to": "daily-option",
+      "label": "Option A",
+      "role": "branch"
+    },
+    {
+      "from": "question",
+      "to": "weekend-option",
+      "label": "Option B",
+      "role": "branch"
+    },
+    {
+      "from": "daily-option",
+      "to": "combined-plan",
+      "label": "Default"
+    },
+    {
+      "from": "weekend-option",
+      "to": "combined-plan",
+      "label": "Catch-up",
+      "fromSide": "right",
+      "toSide": "bottom"
+    },
+    {
+      "from": "combined-plan",
+      "to": "review-later",
+      "label": "Review"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Discussion outcome",
+      "items": [
+        "Short daily sessions are the default",
+        "Use weekends for catch-up when busy",
+        "A plan, not an execution record"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "Evidence scope",
+      "items": [
+        "All messages are fictional",
+        "Results after one month remain unknown"
+      ]
+    }
+  ]
+}

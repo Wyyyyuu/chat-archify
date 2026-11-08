@@ -25,6 +25,8 @@ description: 将单个长对话、多个相关 AI 对话或项目记录整理为
 
 生成页面时才读取 [页面生成规范](references/delivery.md)、[交互打包](references/interactive.md) 与 [章节工作台](references/workbench.md)。复用固定模板和脚本，不重新编写整页 HTML。桌面首次左侧居中显示紧凑总框线图，中／右栏为点击提示；点击阶段再进入子流程与详情。保留可调宽三栏、无交叉连线、文件／对话阅读、搜索及人工关联。
 
+完整交互页保留中文／English 切换。按用户语言设置 manifest.locale（`zh-CN` 或 `en`）；界面切换不翻译原始对话、文件正文或已写入的项目记录。摘要与节点说明按交付语言撰写，引用仍保留原文。语言规则与示例命令见 [交互打包](references/interactive.md#界面语言)。
+
 需要续聊包、审查更新或更新 Skill 时再读 [续聊与更新](references/continuation-and-updates.md)。更新先生成候选并审查，保持批准回执与实际输入一致；不自动下载安装。
 
 ## 验收与交付

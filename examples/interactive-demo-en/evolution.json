@@ -1,0 +1,249 @@
+{
+  "schema_version": 1,
+  "project": {
+    "title": "Fictional reading plan",
+    "summary": "Six fictional messages compare two reading schedules and combine them into a trial plan.",
+    "updated_at": "",
+    "current_state": "A flexible plan has been agreed; no reading results have been recorded."
+  },
+  "coverage": [
+    "Only the six explicitly fictional messages in conversation.md are included. No real tasks, execution history, or attachments are inferred."
+  ],
+  "sources": [
+    {
+      "id": "fictional-chat",
+      "title": "Fictional reading-plan discussion",
+      "kind": "conversation",
+      "coverage": "full",
+      "locator": "11111111-1111-4111-8111-111111111111; all six demo messages in conversation.md",
+      "uri": "conversation.md",
+      "note": "Synthetic demo material. No original task URL was provided; only location details are available."
+    },
+    {
+      "id": "source-brief",
+      "title": "Supporting reading notes",
+      "kind": "document",
+      "coverage": "full",
+      "locator": "resources/source-brief.md",
+      "uri": "resources/source-brief.md",
+      "note": "This document is also referenced by a stage; both links refer to the same snapshot."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "question",
+      "kind": "goal",
+      "title": "Build a reading habit",
+      "summary": "Find a sustainable reading rhythm despite an unpredictable schedule.",
+      "reason": "The user describes a goal; no later execution evidence is provided.",
+      "branch": "Reading plan",
+      "status": "proposed",
+      "date": "",
+      "evidence": [
+        {
+          "source": "fictional-chat",
+          "locator": "Turn ID: aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1; conversation.md L5–10",
+          "note": "The fictional user proposes a reading-habit goal."
+        }
+      ],
+      "artifacts": []
+    },
+    {
+      "id": "daily-option",
+      "kind": "experiment",
+      "title": "Try short daily sessions",
+      "summary": "The assistant proposes ten minutes a day to make starting easier.",
+      "reason": "Small, regular goals may fit the schedule; this is a candidate suggestion.",
+      "branch": "Daily reading",
+      "status": "proposed",
+      "date": "",
+      "evidence": [
+        {
+          "source": "fictional-chat",
+          "locator": "Turn ID: bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb2; conversation.md L12–17",
+          "note": "The fictional assistant proposes ten minutes of daily reading."
+        }
+      ],
+      "artifacts": [
+        {
+          "label": "Reading schedule",
+          "uri": "resources/reading-plan.md",
+          "role": "produced",
+          "verification": "exists",
+          "version": "fictional-demo-1",
+          "note": "Two Markdown snapshots link to each other. They are fictional plans, not execution records."
+        },
+        {
+          "label": "Daily reading guide",
+          "uri": "resources/daily-guide.md",
+          "role": "produced",
+          "verification": "exists",
+          "version": "fictional-demo-1",
+          "note": "A third fictional Markdown attachment."
+        }
+      ]
+    },
+    {
+      "id": "weekend-option",
+      "kind": "experiment",
+      "title": "Try weekend sessions",
+      "summary": "The user proposes concentrating reading on weekends.",
+      "reason": "Weekday availability varies, so a parallel option is kept.",
+      "branch": "Weekend reading",
+      "status": "proposed",
+      "date": "",
+      "evidence": [
+        {
+          "source": "fictional-chat",
+          "locator": "Turn ID: cccccccc-cccc-4ccc-8ccc-ccccccccccc3; conversation.md L19–24",
+          "note": "The fictional user proposes the weekend option."
+        }
+      ],
+      "artifacts": []
+    },
+    {
+      "id": "combined-plan",
+      "kind": "decision",
+      "title": "Choose a flexible plan",
+      "summary": "Use ten minutes daily as the default, with weekend catch-up when weekdays are busy.",
+      "reason": "This addresses both continuity and an unpredictable weekday schedule.",
+      "branch": "Reading plan",
+      "status": "completed",
+      "date": "",
+      "evidence": [
+        {
+          "source": "fictional-chat",
+          "locator": "Turn ID: dddddddd-dddd-4ddd-8ddd-ddddddddddd4; conversation.md L26–31",
+          "note": "The fictional assistant combines a daily default with weekend catch-up."
+        },
+        {
+          "source": "fictional-chat",
+          "locator": "Message ID: fiction-msg-05; conversation.md L33–38",
+          "note": "The fictional user accepts the plan and says there are no execution results yet."
+        },
+        {
+          "source": "fictional-chat",
+          "locator": "Message ID: fiction-msg-06; conversation.md L40–45",
+          "note": "The fictional assistant links the plan and a one-month review checklist."
+        },
+        {
+          "source": "source-brief",
+          "locator": "resources/source-brief.md",
+          "note": "Supporting notes are referenced as documentary evidence."
+        }
+      ],
+      "artifacts": [
+        {
+          "label": "One-month review",
+          "uri": "resources/review-checklist.md",
+          "role": "produced",
+          "verification": "exists",
+          "version": "fictional-demo-1",
+          "note": "A review template, not a completed review."
+        },
+        {
+          "label": "Supporting reading notes",
+          "uri": "resources/source-brief.md",
+          "role": "referenced",
+          "verification": "exists",
+          "version": "fictional-demo-1",
+          "note": "The same Markdown file is also registered as a document source."
+        }
+      ]
+    },
+    {
+      "id": "review-later",
+      "kind": "milestone",
+      "title": "Review after one month",
+      "summary": "Check whether the plan is practical, then keep or adjust it.",
+      "reason": "The conversation provides no future reading results.",
+      "branch": "Follow-up",
+      "status": "proposed",
+      "date": "",
+      "evidence": [
+        {
+          "source": "fictional-chat",
+          "locator": "Message ID: fiction-msg-05; conversation.md L33–38",
+          "note": "The fictional user proposes checking the plan after one month."
+        }
+      ],
+      "artifacts": []
+    }
+  ],
+  "edges": [
+    {
+      "from": "question",
+      "to": "daily-option",
+      "type": "branches",
+      "confidence": "explicit",
+      "reason": "Propose short daily sessions to meet the reading goal.",
+      "evidence": [
+        {
+          "source": "fictional-chat",
+          "locator": "Turn ID: bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb2",
+          "note": "Propose short daily sessions to meet the reading goal."
+        }
+      ]
+    },
+    {
+      "from": "question",
+      "to": "weekend-option",
+      "type": "branches",
+      "confidence": "explicit",
+      "reason": "Propose weekend sessions for the same reading goal.",
+      "evidence": [
+        {
+          "source": "fictional-chat",
+          "locator": "Turn ID: cccccccc-cccc-4ccc-8ccc-ccccccccccc3",
+          "note": "Propose weekend sessions for the same reading goal."
+        }
+      ]
+    },
+    {
+      "from": "daily-option",
+      "to": "combined-plan",
+      "type": "merges",
+      "confidence": "explicit",
+      "reason": "Choose short daily sessions as the default schedule.",
+      "evidence": [
+        {
+          "source": "fictional-chat",
+          "locator": "Message ID: fiction-msg-05; conversation.md L33–38",
+          "note": "Choose short daily sessions as the default schedule."
+        }
+      ]
+    },
+    {
+      "from": "weekend-option",
+      "to": "combined-plan",
+      "type": "merges",
+      "confidence": "explicit",
+      "reason": "Keep weekend catch-up as a fallback for busy weeks.",
+      "evidence": [
+        {
+          "source": "fictional-chat",
+          "locator": "Message ID: fiction-msg-05; conversation.md L33–38",
+          "note": "Keep weekend catch-up as a fallback for busy weeks."
+        }
+      ]
+    },
+    {
+      "from": "combined-plan",
+      "to": "review-later",
+      "type": "continues",
+      "confidence": "explicit",
+      "reason": "Plan a review in one month; no execution results yet.",
+      "evidence": [
+        {
+          "source": "fictional-chat",
+          "locator": "Message ID: fiction-msg-06; conversation.md L40–45",
+          "note": "Plan a review in one month; no execution results yet."
+        }
+      ]
+    }
+  ],
+  "open_questions": [
+    "Whether this fictional plan was implemented and how often reading occurred are not established by any evidence outside the conversation."
+  ],
+  "revisions": []
+}

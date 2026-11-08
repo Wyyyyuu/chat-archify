@@ -51,7 +51,7 @@ class Element {
       if(part==='[data-node-id]')return Boolean(this.dataset.nodeId);if(part==='[data-chapter]')return Boolean(this.dataset.chapter);
       if(part==='[data-source-start][data-source-end]')return this.dataset.sourceStart!==undefined&&this.dataset.sourceEnd!==undefined;
       if(part==='[data-line]')return this.dataset.line!==undefined;if(part.startsWith('#'))return this.id===part.slice(1);if(part.startsWith('.'))return this.classList.contains(part.slice(1));
-      if(part.startsWith('['))return false;return this.tagName===part.toLowerCase();
+      if(part.startsWith('[')){const attr=part.match(/^\[([\w-]+)\]$/);return Boolean(attr&&this.getAttribute(attr[1])!==null);}return this.tagName===part.toLowerCase();
     });
   }
   querySelectorAll(selector) { return this.children.flatMap(child=>[...(child.matches(selector)?[child]:[]),...child.querySelectorAll(selector)]); }
@@ -74,12 +74,20 @@ for(const match of template.matchAll(/<([a-z][\w-]*)\b[^>]*\bid="([^"]+)"[^>]*>/
 const dataElement=new Element('script');dataElement.id='explorer-data';dataElement.textContent=JSON.stringify(payload);ids.set(dataElement.id,dataElement);body.append(dataElement);
 const findId=(node,id)=>node.id===id?node:node.children.map(child=>findId(child,id)).find(Boolean)||null;
 const doc={body,createElement:tag=>new Element(tag),getElementById:id=>ids.get(id)||findId(body,id),querySelectorAll:s=>body.querySelectorAll(s),listeners:{},matches:()=>false,addEventListener(type,fn){(this.listeners[type]??=[]).push(fn);},createTreeWalker(root){const nodes=[];const visit=n=>{if(n._text)nodes.push(new FakeTextNode(n,n._text));for(const child of n.children)visit(child);};visit(root);let i=0;return{nextNode:()=>nodes[i++]||null};}};
+doc.documentElement=new Element('html');
+const localeMatch=page.match(/<script type="application\/json" id="locale-data">([\s\S]*?)<\/script>/);
+if(localeMatch){const localeElement=new Element('script');localeElement.id='locale-data';localeElement.textContent=localeMatch[1];ids.set('locale-data',localeElement);body.append(localeElement);}
+// Static UI slots, including those without IDs, are represented for locale checks.
+for(const match of template.matchAll(/<([a-z][\w-]*)\b[^>]*data-i18n(?:-[\w-]+)?="[^"]+"[^>]*>/gi)){
+ const id=match[0].match(/\bid="([^"]+)"/),node=id?ids.get(id[1]):new Element(match[1]);
+ if(!node)continue;for(const attr of match[0].matchAll(/([\w-]+)="([^"]*)"/g))node.setAttribute(attr[1],attr[2]);if(!id)body.append(node);
+}
 body.parentElement=doc;
 activeDocument=doc;
 let desktop=true;
 const windowListeners={};const window={matchMedia:query=>({matches:query.includes('min-width')?desktop:false}),addEventListener(type,fn){(windowListeners[type]??=[]).push(fn);},dispatchEvent(e){for(const fn of windowListeners[e.type]||[])fn(e);}};
 const location={hash:''},historyRows=[];let historyIndex=-1;
-const history={get state(){return historyRows[historyIndex]?.state||null;},replaceState(state,_title,url){if(historyIndex<0){historyRows.push({state,url});historyIndex=0;}else historyRows[historyIndex]={state,url};if(url&&String(url).includes('#'))location.hash=String(url).slice(String(url).indexOf('#'));},pushState(state,_title,url){historyRows.splice(historyIndex+1);historyRows.push({state,url});historyIndex++;if(url&&String(url).includes('#'))location.hash=String(url).slice(String(url).indexOf('#'));},back(){if(historyIndex>0){historyIndex--;window.dispatchEvent({type:'popstate',state:this.state});}},forward(){if(historyIndex+1<historyRows.length){historyIndex++;window.dispatchEvent({type:'popstate',state:this.state});}}};
+const history={get state(){return historyRows[historyIndex]?.state||null;},replaceState(state,_title,url){if(historyIndex<0){historyRows.push({state,url});historyIndex=0;}else historyRows[historyIndex]={state,url};if(url&&String(url).includes('#'))location.hash=String(url).slice(String(url).indexOf('#'));},pushState(state,_title,url){historyRows.splice(historyIndex+1);historyRows.push({state,url});historyIndex++;if(url&&String(url).includes('#'))location.hash=String(url).slice(String(url).indexOf('#'));},back(){if(historyIndex>0){historyIndex--;location.hash=historyRows[historyIndex].url;window.dispatchEvent({type:'popstate',state:this.state});}},forward(){if(historyIndex+1<historyRows.length){historyIndex++;location.hash=historyRows[historyIndex].url;window.dispatchEvent({type:'popstate',state:this.state});}}};
 const blobs=new Map();let blobSerial=0;class TestURL extends URL{static createObjectURL(blob){const u=`blob:portable-${++blobSerial}`;blobs.set(u,blob);return u;}static revokeObjectURL(){}}
 const storageRows=new Map();const localStorage={getItem:key=>storageRows.get(key)||null,setItem:(key,value)=>storageRows.set(key,String(value)),removeItem:key=>storageRows.delete(key)};
 class Observer{constructor(fn){this.callback=fn;}observe(){}disconnect(){}}
@@ -87,6 +95,7 @@ const context=vm.createContext({document:doc,window,history,location,localStorag
 const assetScript=page.match(/<script>([\s\S]*?)<\/script>/)[1];
 vm.runInContext(assetScript,context,{timeout:10000});
 const run=source=>vm.runInContext(source,context),$=id=>doc.getElementById(id==='conversation-content'?'conversation-list':id);
+const initialLocale=payload.locale||'zh-CN';assert.equal(run('window.ChatArchifyI18n.language'),initialLocale);assert.equal(doc.documentElement.getAttribute('lang'),initialLocale);if(initialLocale==='en')assert.equal($('continuation-open').textContent,'Export handoff');run("window.ChatArchifyI18n.setLanguage('zh-CN')");
 const sourceChapter=payload.chapters.find(item=>item.id===(payload.navigation?.source_chapter||payload.chapters[0].id))||payload.chapters[0],record=sourceChapter.record;
 assert.equal(run('app.view'),'overview','a fresh page opens the project flowchart');
 assert.equal($('reader-panel').hidden,false,'desktop keeps the detail column visible');
@@ -285,14 +294,61 @@ $('reader-content').scrollTop=376;$('reader-content').dispatchEvent({type:'scrol
 assert.equal(run('app.fileId'),fileId);assert.equal($('reader-content').scrollTop,218,'Back restores the first file position');
 history.forward();assert.equal(run('app.fileId'),secondFile.id);assert.equal($('reader-content').scrollTop,376,'Forward restores the second file position');
 
-const search=$('search'),results=$('results');search.value='阅读';search.dispatchEvent({type:'input'});
+const search=$('search'),results=$('results');search.value=payload.locale==='en'?'reading':'阅读';search.dispatchEvent({type:'input'});
 const kinds=results.querySelectorAll('.search-group-heading').map(node=>node.textContent.split(' · ')[0]);
 assert.deepEqual(kinds,['阶段','文件','对话摘录'],'the global search indexes each content kind');
 console.log(JSON.stringify({status:'passed',kind:'portable fake-DOM runtime check; not real-browser evidence',checks:['overview-first drill-down','node click opens reader','embedded file link opens in reader','two relative Markdown files navigate A/B with Back/Forward scroll','global search groups stages, files, and saved excerpts']}));
 
-search.value='蓝鲸书签';search.dispatchEvent({type:'input'});
+search.value=payload.locale==='en'?'blue whale bookmark':'蓝鲸书签';search.dispatchEvent({type:'input'});
 assert.deepEqual(results.querySelectorAll('.search-group-heading').map(n=>n.textContent.split(' · ')[0]),['文件'],'Pro indexes the fourth attachment body');
 const bodyHit=results.querySelector('.result');assert.ok(bodyHit);bodyHit.click();
 assert.equal(run('app.view'),'file');
 assert.equal(payload.files[run('app.fileId')].name,'source-brief.md');
 console.log(JSON.stringify({status:'passed',check:'Pro body-only search opens the fourth embedded resource'}));
+
+// Locale changes preserve source data, navigation, scroll and dialog state.
+const originalData=run('JSON.stringify(E)'),originalFile=run('app.fileId'),originalText=$('file-render').textContent;
+$('reader-content').scrollTop=223;
+run("window.ChatArchifyI18n.setLanguage('en')");
+assert.equal(doc.documentElement.getAttribute('lang'),'en');
+assert.equal($('continuation-open').textContent,'Export handoff');
+assert.equal($('search').getAttribute('placeholder'),'Search stages, files, or excerpts');
+assert.equal(run('app.fileId'),originalFile);assert.equal($('reader-content').scrollTop,223);
+assert.equal($('file-render').textContent,originalText,'source file text is not translated');
+assert.ok($('reader-actions').textContent.includes('Download file'));
+assert.equal(run('STATUS.verified'),'Verified');assert.ok(location.hash.includes('lang=en'));history.back();assert.ok(location.hash.includes('lang=en'),'history keeps the selected interface language in copied links');history.forward();assert.equal(run('app.fileId'),originalFile);
+search.value=payload.locale==='en'?'reading':'阅读';search.dispatchEvent({type:'input'});
+assert.deepEqual(results.querySelectorAll('.search-group-heading').map(n=>n.textContent.split(' · ')[0]),['Stage','File','Conversation excerpts']);
+run(`navigateNode(${JSON.stringify(fileNode.id)},${JSON.stringify(fileChapter.id)})`);
+let detail=$('reader-content').querySelector('.technical-details');detail.open=true;detail.dispatchEvent({type:'toggle'});
+$('reader-content').scrollTop=137;
+run("window.ChatArchifyI18n.setLanguage('zh-CN')");
+assert.equal($('reader-content').querySelector('.technical-details').open,true);assert.equal($('reader-content').scrollTop,137);
+const localeEntry=payload.conversations.find(e=>['assistant','助手'].includes(e.role));
+run(`navigateToConversationIndex(null);navigateToConversationEntry(${JSON.stringify(localeEntry.id)})`);
+$('conversation-dialog-content').scrollTop=91;
+const conversationBefore=$('conversation-dialog-content').querySelectorAll('.conversation-message-body').map(n=>n.textContent);
+run("window.ChatArchifyI18n.setLanguage('en')");
+assert.equal($('conversation-dialog').open,true);assert.equal($('conversation-dialog-content').scrollTop,91);
+assert.deepEqual($('conversation-dialog-content').querySelectorAll('.conversation-message-body').map(n=>n.textContent),conversationBefore);
+assert.ok($('conversation-dialog-content').querySelector('.conversation-message-head').textContent.includes('Assistant'));
+$('conversation-dialog-close').click();$('continuation-open').click();
+const goalInput=$('continuation-root').querySelector('input');goalInput.value='Keep my goal';goalInput.dispatchEvent({type:'input'});
+run("window.ChatArchifyI18n.setLanguage('zh-CN');window.ChatArchifyI18n.setLanguage('en')");
+assert.equal($('continuation-dialog').open,true);assert.equal($('continuation-root').querySelector('input').value,'Keep my goal');
+assert.ok($('continuation-root').textContent.includes('# Continuation pack'));
+$('continuation-close').click();$('update-review-open').click();
+assert.ok($('update-review-root').textContent.includes('Choose a previous version'));
+run("window.ChatArchifyI18n.setLanguage('zh-CN');window.ChatArchifyI18n.setLanguage('en')");
+assert.equal($('update-review-dialog').open,true);assert.ok($('update-review-root').textContent.includes('Approve entire update'));
+$('update-review-close').click();assert.equal(run('JSON.stringify(E)'),originalData,'locale switching must not mutate records, messages or embedded file bytes');
+assert.equal(run("window.ChatArchifyI18n.setLanguage('fr')"),false);
+console.log(JSON.stringify({status:'passed',check:'Bilingual runtime',kind:'in-process DOM; not browser QA',checks:['default locale','static labels and accessibility','English search after switching','file bytes and reading position','expanded details','conversation roles and original messages','continuation goal','review controls','invalid locale rejection']}));
+if(payload.locale==='en'){
+ const noChinese=(id)=>assert.ok(!/[\u3400-\u9fff]/.test($(id).textContent),`${id} contains untranslated text: ${$(id).textContent.match(/.{0,25}[\u3400-\u9fff].{0,25}/)?.[0]}`);
+ for(const chapter of payload.chapters)for(const node of chapter.record.nodes){run(`navigateNode(${JSON.stringify(node.id)},${JSON.stringify(chapter.id)})`);for(const id of ['reader-content','overview-graph','native-graph','rail-note'])noChinese(id);}
+ for(const file of Object.values(payload.files)){run(`openFile(${JSON.stringify(file.id)})`);noChinese('reader-content');}
+ run('navigateToConversationIndex(null)');noChinese('reader-content');
+ for(const entry of payload.conversations){run(`navigateToConversationEntry(${JSON.stringify(entry.id)})`);noChinese('conversation-dialog-content');$('conversation-dialog-close').click();}
+ console.log(JSON.stringify({status:'passed',check:'English demo rendered content',kind:'in-process DOM; not browser QA'}));
+}

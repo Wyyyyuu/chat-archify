@@ -110,9 +110,11 @@ def _validate_migration_project(manifest_project_id, payload, label):
         raise ValueError(f'{label} must have the same project_id as the manifest')
 
 
-def package(manifest_path, output, snapshot_from=None, identity_from=None, refresh_conversations=()):
+def package(manifest_path, output, snapshot_from=None, identity_from=None, refresh_conversations=(), language=None):
     manifest_path,output=Path(manifest_path).resolve(),Path(output).resolve()
     manifest=json.loads(manifest_path.read_text(encoding='utf-8-sig'))
+    locale=language or manifest.get('locale','zh-CN')
+    if locale not in ('zh-CN','en'):raise ValueError('locale must be zh-CN or en')
     project_id=manifest.get('project_id')
     if 'project_id' in manifest and (not isinstance(project_id,str) or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._:-]{0,127}',project_id)):
         raise ValueError('project_id must be a stable nonempty ASCII identifier of at most 128 characters')
@@ -185,7 +187,7 @@ def package(manifest_path, output, snapshot_from=None, identity_from=None, refre
                 assert len(raw_snapshot)==preserved['bytes']
                 reason=credential_reason(path.name,raw_snapshot,(preserved.get('name'),))
                 if reason:
-                    file.update(status='excluded',note=reason)
+                    file.update(status='excluded',note=reason,note_key=reason)
                     return
                 if not str(preserved.get('mime','')).startswith('image/'):
                     text=decode_text(raw_snapshot)
@@ -200,7 +202,7 @@ def package(manifest_path, output, snapshot_from=None, identity_from=None, refre
         if not path.exists():return
         reason=credential_reason(path.name)
         if reason:
-            file.update(status='excluded',note=reason);return
+            file.update(status='excluded',note=reason,note_key=reason);return
         if path.is_dir():
             paths=sorted(str(p.relative_to(path)).replace('\\','/') for p in path.rglob('*') if p.is_file())
             raw=('目录索引（不包含目录内文件内容）\n原始位置：'+str(path)+'\n\n'+'\n'.join(paths)+'\n').encode('utf-8')
@@ -209,10 +211,10 @@ def package(manifest_path, output, snapshot_from=None, identity_from=None, refre
             raw=path.read_bytes()
             file['mime']=mimetypes.guess_type(path.name)[0] or 'application/octet-stream'
         if len(raw)>25*1024*1024:
-            file.update(status='excluded',note='单文件超过25 MB，保留原始位置。');return
+            file.update(status='excluded',note='单文件超过25 MB，保留原始位置。',note_key='单文件超过25 MB，保留原始位置。');return
         reason=credential_reason(path.name,raw)
         if reason:
-            file.update(status='excluded',note=reason);return
+            file.update(status='excluded',note=reason,note_key=reason);return
         if not file['mime'].startswith('image/'):
             text=decode_text(raw)
             if text is not None:
@@ -254,7 +256,7 @@ def package(manifest_path, output, snapshot_from=None, identity_from=None, refre
     if refreshed_paths != refresh_paths:
         raise ValueError('--refresh-conversation must name conversation sources in the manifest records')
     conversations=build_conversation_index(packed,pool)
-    payload={'title':manifest['title'],'chapters':packed,'files':pool,'conversations':conversations,'created_at':datetime.now().isoformat(timespec='seconds')}
+    payload={'title':manifest['title'],'locale':locale,'chapters':packed,'files':pool,'conversations':conversations,'created_at':datetime.now().isoformat(timespec='seconds')}
     payload['collection_audit']=validate_package_collection(manifest,base,packed,pool)
     if project_id is not None:payload['project_id']=project_id
     if migration_payload:
@@ -262,14 +264,28 @@ def package(manifest_path, output, snapshot_from=None, identity_from=None, refre
         payload['conversation_group_aliases']=group_aliases
         payload['conversation_entry_aliases']=entry_aliases
     payload['navigation']=navigation_data(manifest,packed)
+    if not manifest.get('navigation') or 'note' not in manifest['navigation']:
+        payload['navigation']['note_key']=payload['navigation'].get('note','')
     payload['start']=initial_target(manifest,packed)
     source=Path(__file__).resolve().parent.parent
     template=(source/'assets/interactive.html').read_text(encoding='utf-8')
-    script='\n;\n'.join((source/name).read_text(encoding='utf-8') for name in ['assets/vendor/marked.umd.js','assets/markdown.js','assets/conversations.js','assets/project-tools.js','assets/interactive.js'])
+    script='\n;\n'.join((source/name).read_text(encoding='utf-8') for name in ['assets/vendor/marked.umd.js','assets/i18n.js','assets/markdown.js','assets/conversations.js','assets/project-tools.js','assets/interactive.js'])
     assert not re.search(r'</script',script,re.I), 'Inline script contains a closing script tag'
     serialized=json.dumps(payload,ensure_ascii=False).replace('&','\\u0026').replace('<','\\u003c').replace('>','\\u003e')
-    replacements={'@@TITLE@@':html.escape(manifest['title']),'@@PAYLOAD@@':serialized,'@@SCRIPT@@':script}
-    page=re.sub(r'@@(?:TITLE|PAYLOAD|SCRIPT)@@',lambda m:replacements[m[0]],template)
+    catalog=json.loads((source/'assets/locales/en.json').read_text(encoding='utf-8'))
+    if locale=='en':
+        # Translate only declared UI slots before first paint, never project data.
+        template=re.sub(r'(<[^>]+data-i18n="([^"]+)"[^>]*>)([^<]*)(</[^>]+>)',lambda m:m[1]+html.escape(catalog.get(html.unescape(m[2]),html.unescape(m[3])))+m[4],template)
+        for attr in ('aria-label','title','placeholder'):
+            def localize_attr(match):
+                tag=match[0];key=re.search(r'data-i18n-'+attr+r'="([^"]+)"',tag)
+                if not key:return tag
+                label=html.escape(catalog.get(html.unescape(key[1]),html.unescape(key[1])),quote=True)
+                return re.sub(r'(?<![\w-])'+attr+r'="[^"]*"',lambda _:attr+'="'+label+'"',tag)
+            template=re.sub(r'<[^>]+>',localize_attr,template)
+    locale_json=json.dumps(catalog,ensure_ascii=False).replace('&','\\u0026').replace('<','\\u003c').replace('>','\\u003e')
+    replacements={'@@TITLE@@':html.escape(manifest['title']),'@@LANG@@':locale,'@@LOCALE@@':locale_json,'@@PAYLOAD@@':serialized,'@@SCRIPT@@':script}
+    page=re.sub(r'@@(?:TITLE|LANG|LOCALE|PAYLOAD|SCRIPT)@@',lambda m:replacements[m[0]],template)
     output.parent.mkdir(parents=True,exist_ok=True)
     if output.exists():
         backup=output.parent/'history'/datetime.now().strftime('%Y%m%d-%H%M%S-%f')
@@ -287,4 +303,5 @@ if __name__=='__main__':
     parser.add_argument('--snapshot-from',help='Reuse exact attachments from an existing interactive HTML and migrate associations')
     parser.add_argument('--identity-from',help='Migrate stable conversation identities from an existing interactive HTML')
     parser.add_argument('--refresh-conversation',action='append',default=[],help='With --snapshot-from, refresh this conversation export only; may be repeated. Other snapshots stay archived.')
-    args=parser.parse_args();package(args.manifest,args.output,args.snapshot_from,args.identity_from,args.refresh_conversation)
+    parser.add_argument('--language',choices=['zh-CN','en'],help='Initial interface language; overrides manifest.locale. Source text is unchanged.')
+    args=parser.parse_args();package(args.manifest,args.output,args.snapshot_from,args.identity_from,args.refresh_conversation,args.language)

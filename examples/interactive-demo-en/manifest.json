@@ -1,0 +1,12 @@
+{
+  "title": "Fictional reading plan",
+  "chapters": [
+    {
+      "id": "overview",
+      "label": "Discussion overview",
+      "record": "evolution.json",
+      "viewer": "archify-overview.html"
+    }
+  ],
+  "locale": "en"
+}

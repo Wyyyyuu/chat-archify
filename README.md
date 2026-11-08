@@ -8,7 +8,7 @@ Turn scattered conversations into a clickable map of **what changed, why it chan
 
 **English** · [Simplified Chinese](README.zh-CN.md)
 
-[Download the skill](https://github.com/Wyyyyuu/chat-archify/releases/tag/v0.7.1) · [Try the HTML demo](https://github.com/Wyyyyuu/chat-archify/releases/download/v0.7.1/chat-archify-demo.html) · [How it works](#from-conversation-to-context)
+[Download the skill](https://github.com/Wyyyyuu/chat-archify/releases/tag/v0.8.0) · [Try the HTML demo](https://github.com/Wyyyyuu/chat-archify/releases/download/v0.8.0/chat-archify-demo-en.html) · [How it works](#from-conversation-to-context)
 
 **One full version · Offline HTML · Use only when you ask**
 
@@ -46,6 +46,7 @@ Chat Archify is a skill for answering those questions. It turns the available co
 
 ### More than a diagram
 
+- **English and Chinese interface:** switch without losing your place, expanded records, or conversation reader.
 - **Files with meaning:** short descriptions and purpose-based groups; no wall of per-file code diffs by default.
 - **Traceable conversations:** question-based index titles, in-page question/answer reading, search, and manual links between a conversation and a module.
 - **Collection receipts:** where supported, collect readable active and archived Codex chats with pagination, checkpoints, and explicit gaps. Other hosts can use user-provided exports.
@@ -55,17 +56,17 @@ Chat Archify is a skill for answering those questions. It turns the available co
 
 ## Try it in two minutes
 
-The downloadable viewer and demo content currently use Chinese. The English illustrations above explain the same layout.
+The linked demo starts in English, including its fictional conversation and files. Use the language selector in the top bar to switch the interface between English and Chinese. Original conversations and file contents keep their source language.
 
-1. [Download the fictional demo](https://github.com/Wyyyyuu/chat-archify/releases/download/v0.7.1/chat-archify-demo.html) and open it in a modern desktop browser. GitHub provides a file download, not a running HTML app.
+1. [Download the fictional demo](https://github.com/Wyyyyuu/chat-archify/releases/download/v0.8.0/chat-archify-demo-en.html) and open it in a modern desktop browser. GitHub provides a file download, not a running HTML app.
 2. Select a stage in the left panel, then select the decision node where the two candidate paths merge. Explore its explanation and linked files in the right panel.
-3. Use the conversation-index button in the right panel to read the saved messages. To prepare a handoff, use the export button next to search in the top bar.
+3. Choose **Open conversation index** in the right panel to read the saved messages. Use **Export handoff** in the top bar to prepare a continuation pack.
 
 The example contains six synthetic messages, five nodes, and four Markdown resources. It contains no real user chat.
 
 ## Install and use
 
-Download `chat-archify.zip` from the [v0.7.1 release](https://github.com/Wyyyyuu/chat-archify/releases/tag/v0.7.1). Extract the `chat-archify` folder into your host's skills directory. In Codex, that is normally `~/.codex/skills/`; restart or reload skills if needed.
+Download `chat-archify.zip` from the [v0.8.0 release](https://github.com/Wyyyyuu/chat-archify/releases/tag/v0.8.0). Extract the `chat-archify` folder into your host's skills directory. In Codex, that is normally `~/.codex/skills/`; restart or reload skills if needed.
 
 **The repository, archive, installation folder, and skill invocation now all use `chat-archify`.** There is one full public version, with no feature tiers, purchase, or license key required. When upgrading from a formerly named edition, back up and remove its old folder from the active skills directory, then install `chat-archify` and use `$chat-archify`. Keep your generated HTML and project records; they do not need to be recreated.
 
@@ -103,10 +104,10 @@ The skill runs only when explicitly requested. It does not monitor chats in the 
 Run from the installed skill directory, replacing the Archify path:
 
 ```sh
-python scripts/build_interactive_demo.py --archify-dir "/path/to/archify" --out-dir "demo-output"
+python scripts/build_interactive_demo.py --archify-dir "/path/to/archify" --out-dir "demo-output" --language en
 ```
 
-Open `demo-output/chat-archify-demo.html`. The command builds the example and runs the included programmatic checks. For a plain conversation without project files:
+Open `demo-output/chat-archify-demo-en.html`. The command builds the example and runs the included programmatic checks. Use `--language zh-CN` for the Chinese demo (`chat-archify-demo.html`). For a plain conversation without project files:
 
 ```sh
 python scripts/build_plain_demo.py --archify-dir "/path/to/archify" --out-dir "plain-demo"

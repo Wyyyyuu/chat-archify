@@ -103,7 +103,7 @@ class DemoArtifactRegression(unittest.TestCase):
         record=chapter['record']
         self.assertEqual(len(record['nodes']),5)
         self.assertEqual(len(record['edges']),5)
-        self.assertIn('虚构',record['coverage'][0])
+        self.assertIn('fictional' if self.payload.get('locale')=='en' else '虚构',record['coverage'][0])
         viewer=base64.b64decode(chapter['viewer'],validate=True)
         self.assertEqual(hashlib.sha256(viewer).hexdigest(),chapter['viewer_sha256'])
         self.assertEqual(viewer,self.viewer_path.read_bytes())
@@ -145,7 +145,7 @@ class DemoArtifactRegression(unittest.TestCase):
             self.assertEqual(hashlib.sha256(raw).hexdigest(),item['sha256'])
         self.assertIn('review-checklist.md',file_by_name['reading-plan.md']['text'])
         self.assertIn('reading-plan.md',file_by_name['review-checklist.md']['text'])
-        self.assertIn('蓝鲸书签',file_by_name['source-brief.md']['text'])
+        self.assertIn('blue whale bookmark' if self.payload.get('locale')=='en' else '蓝鲸书签',file_by_name['source-brief.md']['text'])
         source=next(item for item in chapter['record']['sources'] if item['id']=='source-brief')
         artifact=next(item for node in chapter['record']['nodes'] for item in node['artifacts'] if item['uri'].endswith('source-brief.md'))
         self.assertEqual(source['file_id'],artifact['file_id'])

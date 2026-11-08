@@ -52,9 +52,9 @@ def check_environment(archify_dir):
     return node
 
 
-def build(archify_dir,out_dir):
+def build(archify_dir,out_dir,language='zh-CN'):
     root=Path(__file__).resolve().parent.parent
-    example=root/'examples'/'interactive-demo'
+    example=root/'examples'/('interactive-demo-en' if language=='en' else 'interactive-demo')
     test_dir=root/'tests'
     archify_dir=archify_dir.expanduser().resolve()
     out_dir=out_dir.expanduser().resolve()
@@ -67,8 +67,9 @@ def build(archify_dir,out_dir):
     manifest=inputs/'manifest.json'
     demo_manifest=json.loads(manifest.read_text(encoding='utf-8'))
     demo_manifest.setdefault('project_id','chat-archify-fictional-reading-plan')
+    demo_manifest['locale']=language
     manifest.write_text(json.dumps(demo_manifest,ensure_ascii=False,indent=2),encoding='utf-8')
-    packaged=out_dir/'chat-archify-demo.html'
+    packaged=out_dir/('chat-archify-demo-en.html' if language=='en' else 'chat-archify-demo.html')
 
     with tempfile.TemporaryDirectory(prefix='chat-archify-tmp-',dir=str(out_dir)) as temp_dir:
         archify_env=os.environ.copy()
@@ -92,6 +93,7 @@ def build(archify_dir,out_dir):
     run('Continuation and review helpers',[sys.executable,test_dir/'test_project_tools.py'],root)
     run('Continuation and review controls',[node,test_dir/'project-tools-smoke.cjs'],root)
     run('Portable navigation smoke test',[node,test_dir/'interactive-navigation.cjs',packaged],root)
+    run('Language policy and catalog',[node,test_dir/'i18n.cjs'],root)
     print(f'\nComplete interactive demo: {packaged}',flush=True)
     return packaged
 
@@ -100,8 +102,9 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--archify-dir',required=True,type=Path,help='Separately installed Archify skill directory, containing bin/archify.mjs')
     parser.add_argument('--out-dir',required=True,type=Path,help='Directory for copied fictional inputs, Archify viewer, and final HTML')
+    parser.add_argument('--language',choices=['zh-CN','en'],default='zh-CN',help='Language of the interface and fictional example content')
     args=parser.parse_args()
-    try:build(args.archify_dir,args.out_dir)
+    try:build(args.archify_dir,args.out_dir,args.language)
     except (OSError,RuntimeError,ValueError) as error:
         print(f'Chat Archify demo was not completed: {error}',file=sys.stderr)
         return 1
